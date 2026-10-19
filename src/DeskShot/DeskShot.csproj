@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets/deskshot.ico</ApplicationIcon>
+    <AssemblyName>DeskShot</AssemblyName>
+    <RootNamespace>DeskShot</RootNamespace>
+    <Version>0.5.0</Version>
+    <Description>Captura y anota tu pantalla a resolución nativa.</Description>
+    <!-- La ventana principal es WPF: PerMonitorV2 se declara en el manifiesto.
+         WinForms solo aporta NotifyIcon, no Application.Run ni DPI de ventanas. -->
+    <NoWarn>$(NoWarn);WFO0003</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Tesseract" Version="5.2.0" />
+    <Content Include="tessdata/*.traineddata" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="ThirdParty/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

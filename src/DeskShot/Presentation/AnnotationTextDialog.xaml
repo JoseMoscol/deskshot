@@ -1,0 +1,22 @@
+<Window x:Class="DeskShot.Presentation.AnnotationTextDialog"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Style="{StaticResource {x:Type Window}}" Title="DeskShot · Texto de la anotación"
+ Width="560" Height="430" MinWidth="480" MinHeight="380" WindowStartupLocation="CenterOwner"
+ PreviewKeyDown="Window_PreviewKeyDown">
+ <Grid Margin="24">
+  <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+  <StackPanel Margin="0,0,0,16"><TextBlock Text="Texto en tu captura" FontSize="24" FontWeight="SemiBold" /><TextBlock Text="Escribe varias líneas con Enter. Aplica con Ctrl+Enter." Style="{StaticResource MutedText}" FontSize="12" Margin="0,7,0,0" /></StackPanel>
+  <TextBox x:Name="AnnotationTextBox" Grid.Row="1" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" VerticalContentAlignment="Top" FontSize="16" MaxLength="5000" AutomationProperties.Name="Contenido del texto de anotación" />
+  <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,16,0,0">
+   <TextBlock Text="Tamaño (px)" VerticalAlignment="Center" Margin="0,0,12,0" />
+   <TextBox x:Name="FontSizeBox" Width="90" AutomationProperties.Name="Tamaño del texto en píxeles" />
+   <CheckBox x:Name="BoldBox" Content="Negrita" Margin="20,0,0,0" VerticalAlignment="Center" />
+  </StackPanel>
+  <TextBlock Grid.Row="3" x:Name="ValidationText" Foreground="#FFADAD" TextWrapping="Wrap" Margin="0,10,0,0" FontSize="12" AutomationProperties.LiveSetting="Polite" />
+  <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+   <Button Content="Cancelar" Click="Cancel_Click" Margin="0,0,8,0" />
+   <Button Content="Aplicar texto" Style="{StaticResource AccentButton}" Click="Apply_Click" />
+  </StackPanel>
+ </Grid>
+</Window>

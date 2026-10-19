@@ -1,0 +1,4 @@
+* text=auto
+*.cmd text eol=crlf
+*.traineddata binary
+*.ico binary

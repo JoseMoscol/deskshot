@@ -1,0 +1,97 @@
+<Window x:Class="DeskShot.Presentation.MainWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Style="{StaticResource {x:Type Window}}"
+ Title="DeskShot" Width="1080" Height="780" MinWidth="960" MinHeight="720" WindowStartupLocation="CenterScreen">
+ <Grid>
+  <Grid.ColumnDefinitions><ColumnDefinition Width="206" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+  <Border Background="#121A25" BorderBrush="#243042" BorderThickness="0,0,1,0">
+   <Grid Margin="22,30">
+    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+    <StackPanel>
+     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+      <Border Width="30" Height="30" Background="{StaticResource AccentBrush}" CornerRadius="8" Margin="0,0,10,0">
+       <Path Data="M 3,10 L 3,3 L 10,3 M 16,3 L 23,3 L 23,10 M 23,16 L 23,23 L 16,23 M 10,23 L 3,23 L 3,16" Stroke="#143B30" StrokeThickness="2" Stretch="Uniform" Margin="7" />
+      </Border>
+      <TextBlock Text="deskshot" FontSize="22" FontWeight="Bold" VerticalAlignment="Center" />
+     </StackPanel>
+     <TextBlock Text="CAPTURA LO QUE IMPORTA" FontSize="9" Foreground="{StaticResource MutedBrush}" Margin="0,6,0,38" />
+     <Button x:Name="HomeNav" Content="Inicio" HorizontalContentAlignment="Left" Click="Home_Click" Background="#26384A" Margin="0,0,0,10" />
+     <Button x:Name="SettingsNav" Content="Configuración" HorizontalContentAlignment="Left" Click="Settings_Click" Background="Transparent" BorderThickness="0" />
+     <Button Content="Abrir carpeta" HorizontalContentAlignment="Left" Click="OpenFolder_Click" Background="Transparent" BorderThickness="0" Margin="0,10,0,0" />
+    </StackPanel>
+    <StackPanel Grid.Row="2">
+     <Border BorderBrush="#314238" Background="#172D27" BorderThickness="1" CornerRadius="8" Padding="12">
+      <StackPanel><TextBlock Text="100 % local" Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold" /><TextBlock Text="Tus capturas, en tu equipo." Style="{StaticResource MutedText}" FontSize="11" Margin="0,4,0,0" /></StackPanel>
+     </Border>
+     <Button Content="Salir de DeskShot" Click="Exit_Click" Background="Transparent" BorderThickness="0" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,12,0,0" />
+     <TextBlock Text="DESKSHOT / 0.5" Foreground="#728297" FontSize="10" HorizontalAlignment="Center" Margin="0,14,0,0" />
+    </StackPanel>
+   </Grid>
+  </Border>
+  <Grid Grid.Column="1" Margin="38,30,38,22">
+   <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+   <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <Grid>
+     <StackPanel x:Name="HomePanel">
+      <TextBlock Text="TU ESPACIO DE CAPTURA" Foreground="{StaticResource AccentBrush}" FontSize="11" FontWeight="SemiBold" Margin="0,4,0,18" />
+      <TextBlock Text="Tu pantalla.&#10;Con todos sus detalles." FontSize="36" FontWeight="SemiBold" LineHeight="45" />
+      <TextBlock Text="Selecciona, anota y comparte. Siempre a resolución nativa." Style="{StaticResource MutedText}" Margin="0,14,0,26" />
+      <Border Background="{StaticResource SurfaceBrush}" BorderBrush="#2B3C4E" BorderThickness="1" CornerRadius="14" Padding="26">
+       <Grid>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+        <StackPanel>
+         <TextBlock Text="Una parte, justo la que necesitas." FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap" />
+         <TextBlock Text="Elige un área, ajusta sus bordes y anota con las barras flotantes." Style="{StaticResource MutedText}" Margin="0,9,18,20" />
+         <Button x:Name="RegionButton" Content="＋  Capturar región" Style="{StaticResource AccentButton}" Click="CaptureRegion_Click" HorizontalAlignment="Left" Padding="22,13" />
+        </StackPanel>
+        <Border Grid.Column="1" Width="106" Height="82" CornerRadius="10" BorderBrush="#4F8A7B" BorderThickness="1" Background="#182F2D" Margin="18,0,0,0">
+         <Path Data="M 0,14 L 0,0 L 14,0 M 30,0 L 44,0 L 44,14 M 44,24 L 44,38 L 30,38 M 14,38 L 0,38 L 0,24" Stroke="{StaticResource AccentBrush}" StrokeThickness="2" Stretch="Uniform" Margin="26,20" />
+        </Border>
+       </Grid>
+      </Border>
+      <Button x:Name="DesktopButton" Click="CaptureDesktop_Click" Margin="0,14,0,0" Padding="22,17" Background="#151E29" HorizontalContentAlignment="Stretch">
+       <StackPanel Orientation="Horizontal"><TextBlock Text="▣" FontSize="24" Margin="0,0,14,0" Foreground="{StaticResource AccentBrush}" /><StackPanel><TextBlock Text="Capturar escritorio completo" FontWeight="SemiBold" /><TextBlock Text="Incluye todas tus pantallas conectadas." Foreground="{StaticResource MutedBrush}" FontSize="12" Margin="0,4,0,0" /></StackPanel></StackPanel>
+      </Button>
+      <Button x:Name="ScrollButton" Click="CaptureScroll_Click" Margin="0,12,0,0" Padding="22,17" Background="#151E29" HorizontalContentAlignment="Stretch">
+       <StackPanel Orientation="Horizontal"><TextBlock Text="↕" FontSize="24" Margin="0,0,14,0" Foreground="{StaticResource AccentBrush}" /><StackPanel><TextBlock Text="Capturar con desplazamiento" FontWeight="SemiBold" /><TextBlock Text="Une páginas y documentos a su resolución original." Foreground="{StaticResource MutedBrush}" FontSize="12" Margin="0,4,0,0" /></StackPanel></StackPanel>
+      </Button>
+      <Grid Margin="0,25,0,0">
+       <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition /></Grid.ColumnDefinitions>
+       <StackPanel><TextBlock Text="TU ATAJO GLOBAL" Foreground="{StaticResource MutedBrush}" FontSize="10" /><TextBlock x:Name="ShortcutSummary" FontSize="17" Margin="0,9,0,0" /></StackPanel>
+       <StackPanel Grid.Column="1"><TextBlock Text="FORMATO DE SALIDA" Foreground="{StaticResource MutedBrush}" FontSize="10" /><TextBlock x:Name="FormatSummary" FontSize="17" Margin="0,9,0,0" /></StackPanel>
+      </Grid>
+      <Border BorderBrush="#293547" BorderThickness="0,1,0,0" Margin="0,25,0,0" Padding="0,17,0,0">
+       <TextBlock Text="Todo junto a tu selección: texto, dibujos, copiar, guardar y OCR local. Abre el editor completo cuando necesites más espacio." Style="{StaticResource MutedText}" FontSize="12" />
+      </Border>
+     </StackPanel>
+     <StackPanel x:Name="SettingsPanel" Visibility="Collapsed">
+      <TextBlock Text="A TU MANERA" Foreground="{StaticResource AccentBrush}" FontSize="11" Margin="0,4,0,12" />
+      <TextBlock Text="Configuración" FontSize="32" FontWeight="SemiBold" />
+      <TextBlock Text="Elige cómo capturar y dónde guardar." Style="{StaticResource MutedText}" Margin="0,8,0,20" />
+      <TextBlock Text="Atajo para capturar una región" FontWeight="SemiBold" Margin="0,0,0,8" />
+      <TextBox x:Name="ShortcutBox" IsReadOnly="True" PreviewKeyDown="ShortcutBox_PreviewKeyDown" AutomationProperties.Name="Atajo global de captura" ToolTip="Haz clic y pulsa tu combinación. Ejemplo: Ctrl + Shift + 2." />
+      <TextBlock Text="Haz clic en el campo y pulsa Ctrl, Alt, Shift o Win + una letra, número o tecla F." Style="{StaticResource MutedText}" FontSize="11" Margin="0,5,0,16" />
+      <TextBlock Text="Carpeta de destino" FontWeight="SemiBold" Margin="0,0,0,8" />
+      <DockPanel><Button DockPanel.Dock="Right" Content="Elegir…" Click="BrowseFolder_Click" Margin="10,0,0,0" /><TextBox x:Name="FolderBox" AutomationProperties.Name="Carpeta de destino" /></DockPanel>
+      <Grid Margin="0,18,0,0">
+       <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /></Grid.ColumnDefinitions>
+       <StackPanel Margin="0,0,16,0"><TextBlock Text="Formato" FontWeight="SemiBold" Margin="0,0,0,8" /><ComboBox x:Name="FormatBox" SelectedIndex="0" SelectionChanged="FormatBox_SelectionChanged" AutomationProperties.Name="Formato de imagen"><ComboBoxItem Content="PNG · sin pérdida" /><ComboBoxItem Content="JPG · comprimido" /></ComboBox></StackPanel>
+       <StackPanel Grid.Column="1" Margin="0,0,16,0"><TextBlock Text="Calidad JPG (1–100)" FontWeight="SemiBold" Margin="0,0,0,8" /><TextBox x:Name="QualityBox" AutomationProperties.Name="Calidad JPG" /></StackPanel>
+       <StackPanel Grid.Column="2"><TextBlock Text="Espera (segundos)" FontWeight="SemiBold" Margin="0,0,0,8" /><TextBox x:Name="DelayBox" AutomationProperties.Name="Espera antes de capturar" /></StackPanel>
+      </Grid>
+      <TextBlock Text="PNG conserva los detalles del texto. Ambos formatos mantienen las dimensiones originales. JPG aplica compresión con pérdida." Style="{StaticResource MutedText}" FontSize="11" Margin="0,10,0,14" />
+      <CheckBox x:Name="CopyBox" Content="Copiar al portapapeles después de capturar" />
+      <CheckBox x:Name="AutoSaveBox" Content="Guardar automáticamente una copia al capturar" />
+      <CheckBox x:Name="TrayBox" Content="Al cerrar, mantener DeskShot en la bandeja del sistema" />
+      <TextBlock Text="En modo flotante decides cuándo terminar: Copiar puede guardar una copia automática; Guardar puede copiar la imagen. Al abrir el editor completo se aplican ambos automatismos." Style="{StaticResource MutedText}" FontSize="11" Margin="0,8,0,0" />
+      <Button Content="Guardar configuración" Style="{StaticResource AccentButton}" Click="SaveSettings_Click" HorizontalAlignment="Left" Margin="0,20,0,12" />
+     </StackPanel>
+    </Grid>
+   </ScrollViewer>
+   <Border Grid.Row="1" Background="#141D29" CornerRadius="8" Padding="12,10" Margin="0,18,0,0">
+    <TextBlock x:Name="StatusText" Text="Listo para tu próxima captura." Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" FontSize="12" AutomationProperties.LiveSetting="Polite" />
+   </Border>
+  </Grid>
+ </Grid>
+</Window>

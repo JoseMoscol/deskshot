@@ -1,0 +1,28 @@
+DeskShot OCR — componentes de terceros
+
+Tesseract .NET wrapper 5.2.0
+Copyright 2012–2022 Charles Weld. Apache-2.0.
+https://github.com/charlesw/tesseract
+Incluye InteropDotNet, Copyright 2014 Andrey Akinshin, licencia MIT.
+
+Tesseract OCR 5.2.0 (DLLs del paquete Tesseract 5.2.0)
+Copyright de sus respectivos autores. Apache-2.0.
+https://github.com/tesseract-ocr/tesseract
+
+Modelos spa.traineddata y eng.traineddata (tessdata_fast)
+Apache-2.0. Revisión: 87416418657359cb625c412a48b6e1d6d41c29bd
+https://github.com/tesseract-ocr/tessdata_fast
+SHA-256 spa: 6f2e04d02774a18f01bed44b1111f2cd7f3ba7ac9dc4373cd3f898a40ea6b464
+SHA-256 eng: 7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2
+
+Leptonica 1.82.0 (DLLs del paquete Tesseract)
+Copyright Dan Bloomberg y otros autores. Véase Leptonica.txt.
+https://github.com/DanBloomberg/leptonica
+
+System.Reflection.Emit 4.7.0 (dependencia de Tesseract)
+Copyright .NET Foundation y contribuidores. MIT.
+https://github.com/dotnet/runtime
+
+Las licencias Apache-2.0 y MIT se incluyen en este directorio.
+Los modelos y bibliotecas se distribuyen con la aplicación; no se descargan
+durante el reconocimiento. No se instala un servicio ni una herramienta CLI.

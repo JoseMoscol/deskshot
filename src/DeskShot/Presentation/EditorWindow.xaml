@@ -1,0 +1,56 @@
+<Window x:Class="DeskShot.Presentation.EditorWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Style="{StaticResource {x:Type Window}}"
+ Title="DeskShot · Editor" Width="1180" Height="820" MinWidth="960" MinHeight="620" WindowStartupLocation="CenterScreen"
+ PreviewKeyDown="Window_PreviewKeyDown">
+ <Grid>
+  <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+  <Grid Margin="24,20">
+   <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+   <StackPanel><TextBlock Text="Tu captura, a tu manera." FontSize="23" FontWeight="SemiBold" /><TextBlock x:Name="DimensionsText" Foreground="{StaticResource MutedBrush}" Margin="0,6,0,0" /></StackPanel>
+   <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+    <Button Content="Copiar" Click="Copy_Click" ToolTip="Copiar la imagen editada (Ctrl+C)" Margin="0,0,8,0" />
+    <Button Content="Guardar como…" Click="SaveAs_Click" ToolTip="Elegir nombre y formato (Ctrl+Shift+S)" Margin="0,0,8,0" />
+    <Button Content="Guardar" Click="Save_Click" Style="{StaticResource AccentButton}" ToolTip="Guardar en tu carpeta configurada (Ctrl+S)" />
+   </StackPanel>
+  </Grid>
+  <Border Grid.Row="1" Background="#17212E" BorderBrush="#2C3A4D" BorderThickness="0,1" Padding="20,10">
+   <StackPanel>
+   <WrapPanel VerticalAlignment="Center">
+    <ComboBox x:Name="ToolBox" Width="158" SelectedIndex="0" SelectionChanged="Tool_Changed" AutomationProperties.Name="Herramienta de anotación" Margin="0,0,10,0">
+     <ComboBoxItem Content="Seleccionar (V)" /><ComboBoxItem Content="Lápiz (P)" /><ComboBoxItem Content="Flecha (A)" /><ComboBoxItem Content="Rectángulo (R)" /><ComboBoxItem Content="Resaltador (H)" /><ComboBoxItem Content="Texto (T)" />
+    </ComboBox>
+    <ComboBox x:Name="ColorBox" Width="120" SelectedIndex="0" SelectionChanged="Color_Changed" AutomationProperties.Name="Color de anotación" Margin="0,0,10,0">
+     <ComboBoxItem Content="Coral" /><ComboBoxItem Content="Menta" /><ComboBoxItem Content="Amarillo" /><ComboBoxItem Content="Azul" /><ComboBoxItem Content="Blanco" /><ComboBoxItem Content="Negro" />
+    </ComboBox>
+    <ComboBox x:Name="WidthBox" Width="86" SelectedIndex="1" SelectionChanged="Width_Changed" AutomationProperties.Name="Grosor en píxeles" Margin="0,0,18,0">
+     <ComboBoxItem Content="2 px" /><ComboBoxItem Content="4 px" /><ComboBoxItem Content="8 px" /><ComboBoxItem Content="12 px" />
+    </ComboBox>
+    <Button x:Name="UndoButton" Content="↶" FontSize="18" Padding="13,5" ToolTip="Deshacer (Ctrl+Z)" Click="Undo_Click" Margin="0,0,6,0" />
+    <Button x:Name="RedoButton" Content="↷" FontSize="18" Padding="13,5" ToolTip="Rehacer (Ctrl+Y)" Click="Redo_Click" Margin="0,0,18,0" />
+    <Button Content="Ajustar" Padding="14,9" Click="Fit_Click" ToolTip="Ajustar al espacio disponible (Ctrl+0)" Margin="0,0,8,0" />
+    <ComboBox x:Name="ZoomBox" Width="100" SelectedIndex="0" SelectionChanged="Zoom_Changed" AutomationProperties.Name="Zoom de vista previa">
+     <ComboBoxItem Content="Ajustado" /><ComboBoxItem Content="50 %" /><ComboBoxItem Content="100 %" /><ComboBoxItem Content="150 %" /><ComboBoxItem Content="200 %" />
+    </ComboBox>
+    <Button Content="Extraer texto" Click="ExtractText_Click" ToolTip="OCR local en español e inglés (Ctrl+T)" Margin="16,0,0,0" Padding="16,9" />
+   </WrapPanel>
+   <Grid Margin="0,10,0,0">
+    <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+    <TextBlock x:Name="SelectionHint" Text="Selecciona un objeto para moverlo o cambiar su tamaño. Texto (T): haz clic para escribir." Foreground="{StaticResource MutedBrush}" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,14,0" />
+    <Button x:Name="EditTextButton" Grid.Column="1" Content="Editar texto…" Click="EditText_Click" IsEnabled="False" Padding="12,7" Margin="0,0,8,0" ToolTip="Editar el texto seleccionado (doble clic o F2)" />
+    <Button x:Name="DeleteButton" Grid.Column="2" Content="Eliminar" Click="Delete_Click" IsEnabled="False" Padding="12,7" ToolTip="Eliminar el objeto seleccionado (Supr)" />
+   </Grid>
+   </StackPanel>
+  </Border>
+  <ScrollViewer x:Name="ImageScroll" Grid.Row="2" Background="#080C12" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" SizeChanged="ImageScroll_SizeChanged">
+   <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="28"><Border x:Name="SurfaceHost" Background="White" /></Grid>
+  </ScrollViewer>
+  <Border Grid.Row="3" BorderBrush="#2C3A4D" BorderThickness="0,1,0,0" Padding="20,13">
+   <Grid><Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+    <TextBlock x:Name="EditorStatus" Text="Añade texto y dibujos. Selecciona, mueve y redimensiona sin modificar la captura original." Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" Margin="0,0,15,0" />
+    <TextBlock Grid.Column="1" x:Name="ZoomLabel" Foreground="{StaticResource AccentBrush}" />
+   </Grid>
+  </Border>
+ </Grid>
+</Window>

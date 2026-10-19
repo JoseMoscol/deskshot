@@ -1,0 +1,71 @@
+<Window x:Class="DeskShot.Presentation.FloatingCaptureWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Style="{StaticResource {x:Type Window}}" Title="DeskShot · Captura flotante"
+ WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False" Topmost="True" Background="Black"
+ PreviewKeyDown="Window_PreviewKeyDown" Closing="Window_Closing">
+ <Window.Resources>
+  <Style x:Key="FloatingTool" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+   <Setter Property="Width" Value="36" /><Setter Property="Height" Value="32" /><Setter Property="Padding" Value="0" />
+   <Setter Property="FontSize" Value="20" /><Setter Property="Margin" Value="0,2" />
+   <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" />
+  </Style>
+ </Window.Resources>
+ <Grid x:Name="Root" Background="Transparent" ClipToBounds="True" Focusable="True" PreviewMouseLeftButtonDown="Root_MouseDown" MouseMove="Root_MouseMove" MouseLeftButtonUp="Root_MouseUp" SizeChanged="Root_SizeChanged">
+  <Grid x:Name="SurfaceHost" />
+  <Grid x:Name="ChromeHost" IsHitTestVisible="False" />
+  <Canvas x:Name="BarLayer">
+   <Border x:Name="ToolsPanel" Visibility="Collapsed" Background="#F5171F2B" BorderBrush="#536275" BorderThickness="1" CornerRadius="9" Padding="6">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+     <StackPanel>
+      <Button x:Name="AreaButton" Content="▣" Style="{StaticResource FloatingTool}" Click="Area_Click" ToolTip="Ajustar área (B). Arrastra sus bordes o el fondo para moverla." AutomationProperties.Name="Ajustar área" />
+      <Border BorderBrush="#3A4759" BorderThickness="0,1,0,0" Margin="2,5" />
+      <Button x:Name="SelectButton" Content="↖" Tag="0" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Seleccionar y mover anotaciones (V)" AutomationProperties.Name="Seleccionar anotaciones" />
+      <Button x:Name="PenButton" Content="✎" Tag="1" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Lápiz (P)" AutomationProperties.Name="Lápiz" />
+      <Button x:Name="ArrowButton" Content="↗" Tag="2" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Flecha (A)" AutomationProperties.Name="Flecha" />
+      <Button x:Name="RectangleButton" Content="□" Tag="3" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Rectángulo (R)" AutomationProperties.Name="Rectángulo" />
+      <Button x:Name="HighlightButton" Content="▰" Tag="4" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Resaltador (H)" AutomationProperties.Name="Resaltador" />
+      <Button x:Name="TextButton" Content="T" Tag="5" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Añadir texto (T). Doble clic sobre un texto para editarlo." AutomationProperties.Name="Añadir texto" />
+      <Button x:Name="ColorButton" Style="{StaticResource FloatingTool}" Click="Color_Click" ToolTip="Color y grosor" AutomationProperties.Name="Color y grosor"><Rectangle x:Name="ColorSwatch" Width="20" Height="20" Fill="#FF6B6B" Stroke="White" StrokeThickness="1" RadiusX="3" RadiusY="3" /></Button>
+      <Border BorderBrush="#3A4759" BorderThickness="0,1,0,0" Margin="2,5" />
+      <Button x:Name="UndoButton" Content="↶" Style="{StaticResource FloatingTool}" Click="Undo_Click" ToolTip="Deshacer (Ctrl+Z), incluido el ajuste del área" AutomationProperties.Name="Deshacer" />
+      <Button x:Name="RedoButton" Content="↷" Style="{StaticResource FloatingTool}" Click="Redo_Click" ToolTip="Rehacer (Ctrl+Y)" AutomationProperties.Name="Rehacer" />
+      <Button x:Name="DeleteButton" Content="×" Style="{StaticResource FloatingTool}" Click="Delete_Click" ToolTip="Eliminar la anotación seleccionada (Supr)" AutomationProperties.Name="Eliminar anotación" />
+     </StackPanel>
+    </ScrollViewer>
+   </Border>
+   <Border x:Name="ActionsPanel" Visibility="Collapsed" Background="#F5171F2B" BorderBrush="#536275" BorderThickness="1" CornerRadius="9" Padding="6">
+    <WrapPanel>
+     <Button x:Name="CopyButton" Content="Copiar" Style="{StaticResource AccentButton}" Click="Copy_Click" Padding="13,9" Margin="2" ToolTip="Copiar imagen y terminar (Ctrl+C o Enter)" />
+     <Button x:Name="SaveButton" Content="Guardar" Click="Save_Click" Padding="13,9" Margin="2" ToolTip="Guardar y terminar (Ctrl+S). Ctrl+Shift+S: guardar como." />
+     <Button Content="OCR" Click="Ocr_Click" Padding="13,9" Margin="2" ToolTip="Extraer texto de la región original, sin conexión (Ctrl+T)" />
+     <Button Content="Editor" Click="Editor_Click" Padding="13,9" Margin="2" ToolTip="Continuar en el editor completo (Ctrl+E)" />
+     <Button x:Name="ScrollButton" Content="Desplazar" Click="Scroll_Click" Padding="13,9" Margin="2" ToolTip="Capturar hacia abajo en la ventana real. Selecciona solo el contenido desplazable, sin anotaciones." />
+     <Button Content="×" Click="Cancel_Click" Padding="13,9" Margin="2" ToolTip="Cancelar captura (Esc)" AutomationProperties.Name="Cancelar captura" />
+    </WrapPanel>
+   </Border>
+  </Canvas>
+  <Border x:Name="StatusPanel" Visibility="Collapsed" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="18" Padding="16,10" CornerRadius="8" Background="#F5171F2B" MaxWidth="700" IsHitTestVisible="False">
+   <TextBlock x:Name="StatusText" TextWrapping="Wrap" Foreground="#F1F5FA" AutomationProperties.LiveSetting="Polite" />
+  </Border>
+  <Popup x:Name="ColorPopup" PlacementTarget="{Binding ElementName=ColorButton}" Placement="Left" StaysOpen="False" AllowsTransparency="True">
+   <Border Background="#17212E" BorderBrush="#536275" BorderThickness="1" CornerRadius="8" Padding="14">
+    <StackPanel>
+     <TextBlock Text="COLOR" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,0,0,8" />
+     <StackPanel Orientation="Horizontal">
+      <Button Width="28" Height="28" Padding="0" Margin="2" Background="#FF6B6B" Tag="0" Click="Palette_Click" ToolTip="Coral" AutomationProperties.Name="Coral" />
+      <Button Width="28" Height="28" Padding="0" Margin="2" Background="#78E7C3" Tag="1" Click="Palette_Click" ToolTip="Menta" AutomationProperties.Name="Menta" />
+      <Button Width="28" Height="28" Padding="0" Margin="2" Background="#FFDC46" Tag="2" Click="Palette_Click" ToolTip="Amarillo" AutomationProperties.Name="Amarillo" />
+      <Button Width="28" Height="28" Padding="0" Margin="2" Background="#57A6FF" Tag="3" Click="Palette_Click" ToolTip="Azul" AutomationProperties.Name="Azul" />
+      <Button Width="28" Height="28" Padding="0" Margin="2" Background="White" Tag="4" Click="Palette_Click" ToolTip="Blanco" AutomationProperties.Name="Blanco" />
+      <Button Width="28" Height="28" Padding="0" Margin="2" Background="Black" Tag="5" Click="Palette_Click" ToolTip="Negro" AutomationProperties.Name="Negro" />
+     </StackPanel>
+     <TextBlock Text="Grosor del dibujo" Margin="0,12,0,7" />
+     <ComboBox x:Name="WidthBox" SelectedIndex="1" SelectionChanged="Width_Changed" AutomationProperties.Name="Grosor de anotación">
+      <ComboBoxItem Content="2 px" /><ComboBoxItem Content="4 px" /><ComboBoxItem Content="8 px" /><ComboBoxItem Content="12 px" />
+     </ComboBox>
+    </StackPanel>
+   </Border>
+  </Popup>
+ </Grid>
+</Window>
