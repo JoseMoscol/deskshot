@@ -2,14 +2,22 @@
 
 Aplicación de escritorio para **Windows**, escrita en **C# / .NET 10 / WPF**. Captura a resolución nativa, anota, extrae texto con OCR local y exporta sin reducir las dimensiones de la imagen. La aplicación publicada no utiliza servicios de red. Tesseract y sus modelos se incluyen en la distribución; NuGet solo se necesita al restaurar dependencias para compilar.
 
-## Iniciar
+## Descargar y ejecutar
+
+Descarga la aplicación preparada desde **[Releases · última versión](https://github.com/JoseMoscol/deskshot/releases/latest)**. Elige **DeskShot-0.5.0-win-x64.zip** en Assets, usa **Extraer todo** y abre `DeskShot.exe` dentro de la carpeta extraída. Conserva todos sus archivos. Los ZIP automáticos de Source code contienen el proyecto para compilar, no el programa preparado.
+
+Esta descarga es **portable para Windows x64** e incluye el runtime de .NET y los modelos OCR de español e inglés. No requiere Visual Studio, el SDK ni instalar .NET por separado. Todavía no tiene asistente Setup.exe, firma de código ni actualizador automático. El OCR necesita las bibliotecas Microsoft Visual C++ x64; el manual enlaza su descarga oficial si faltan.
+
+**[Manual de descarga, uso, actualización y desinstalación](docs/INSTALACION.md).**
+
+## Ejecutar desde el proyecto
 
 Abre `artifacts/DeskShot-0.5/DeskShot.exe`, o haz doble clic en `Iniciar DeskShot.cmd` desde la raíz del proyecto. El lanzador compila si todavía no existe el ejecutable publicado. Si la versión anterior sigue en la bandeja, elige **Salir** en su menú antes de abrir esta actualización. La publicación separada conserva intactos los archivos de la instancia anterior y ambas versiones comparten la configuración existente.
 
 - Para ejecutar: **.NET 10 Desktop Runtime** y una sesión interactiva de Windows 10/11.
 - El motor OCR nativo requiere **Microsoft Visual C++ Redistributable 2015–2022** de la arquitectura del proceso (x64 en este equipo). Sus bibliotecas ya estaban instaladas y se verificó el funcionamiento real del motor.
 - Para compilar: **SDK .NET 10** con las referencias de escritorio de Windows. El SDK 10.0.402 ya estaba instalado en el equipo de desarrollo.
-- La carpeta publicada es dependiente del runtime: hay que conservar todos sus archivos junto al `.exe`. Todavía no incluye instalador, firma de código ni actualizador.
+- La publicación local de `build.ps1` es dependiente del runtime. La descarga portable de Releases incluye .NET. En ambos casos hay que conservar todos los archivos junto al `.exe`.
 
 ## Uso
 
@@ -98,6 +106,8 @@ La configuración se guarda al pulsar Guardar configuración en `%LOCALAPPDATA%/
 Las anotaciones editables solo se conservan en memoria mientras el editor está abierto. PNG/JPG exportan la imagen compuesta; un formato de proyecto editable y un historial persistente pueden añadirse después.
 
 ## Compilar y verificar
+
+Para preparar la descarga portable de Windows x64, ejecuta `./package-release.ps1`. Publica con .NET incluido, valida los archivos necesarios y ejecuta las pruebas con un verificador autocontenido que utiliza exactamente la misma DLL de DeskShot. Genera el ZIP y su SHA-256 en `artifacts/releases/v0.5.0`. No sobrescribe paquetes existentes; los archivos temporales y las evidencias quedan en `artifacts/release-staging/`. La primera ejecución puede descargar los paquetes oficiales del runtime desde NuGet. `-SkipTests` omite las pruebas y se reserva para un paquete que ya se haya verificado.
 
 Desde PowerShell:
 

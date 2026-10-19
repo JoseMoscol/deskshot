@@ -1,0 +1,43 @@
+DeskShot {{VERSION}} - Windows x64
+
+DESCARGA Y PREPARACION
+1. Extrae TODO el ZIP en una carpeta permanente de tu usuario.
+2. Abre DeskShot.exe desde la carpeta extraida DeskShot.
+3. Conserva todos los archivos y las carpetas que lo acompanian.
+
+Esta edicion es portable: no incluye un asistente Setup.exe.
+Incluye .NET y los modelos OCR: no necesitas el SDK ni instalar .NET.
+Para Windows 11 x64 (Intel o AMD). En Windows 10, consulta las ediciones
+compatibles con .NET 10 en el manual completo.
+
+OCR LOCAL
+El OCR necesita las bibliotecas Microsoft Visual C++ x64. Si falta esa
+dependencia, instala el redistribuible oficial y vuelve a abrir DeskShot:
+https://aka.ms/vc14/vc_redist.x64.exe
+El reconocimiento funciona sin internet y no envia tus capturas.
+
+USO RAPIDO
+- Ctrl + Shift + 2: seleccionar un area, ajustar bordes y anotar.
+- Copiar / Guardar: terminar la captura. Usa PNG para evitar perdida.
+- OCR: extraer texto y copiarlo al portapapeles.
+- Capturar con desplazamiento: documento al inicio, seleccionar solo
+  el contenido que se mueve y pulsar Desplazar > Iniciar captura.
+  Esc termina y conserva lo unido hasta ese momento.
+- Configuracion: atajo, carpeta, formato PNG/JPG y otras preferencias.
+
+CIERRE Y ACTUALIZACION
+Cerrar la ventana normalmente mantiene DeskShot en la bandeja.
+Para salir por completo, usa Salir desde el icono de la bandeja.
+Sal de la version anterior antes de abrir una actualizacion.
+La configuracion se conserva en %LOCALAPPDATA%\DeskShot\settings.json.
+Para quitar la aplicacion, cierrala y elimina la carpeta extraida.
+Tus capturas guardadas se mantienen en su carpeta de destino.
+
+La aplicacion aun no tiene firma de codigo ni actualizador automatico.
+
+MANUAL COMPLETO Y DESCARGAS
+https://github.com/JoseMoscol/deskshot/blob/main/docs/INSTALACION.md
+https://github.com/JoseMoscol/deskshot/releases/latest
+
+Las licencias y los avisos de terceros estan en ThirdParty/ y en los
+archivos de licencia incluidos con el runtime .NET.
