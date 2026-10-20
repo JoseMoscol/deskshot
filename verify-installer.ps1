@@ -10,11 +10,12 @@ $testId = [Guid]::NewGuid().ToString('N')
 $verificationRoot = Join-Path $PSScriptRoot "artifacts/installer-verification/$testId"
 $installationPath = Join-Path $verificationRoot 'Installed'
 New-Item -ItemType Directory -Path $verificationRoot -Force | Out-Null
-$groupName = "DeskShot Verification $testId"
+$groupName = 'DeskShot'
 $shortcutFolder = Join-Path ([Environment]::GetFolderPath('Programs')) $groupName
+if (Test-Path -LiteralPath $shortcutFolder) { throw 'Ya existe el grupo de Inicio DeskShot. No se utiliza para hacer la prueba.' }
 $settingsPath = Join-Path $env:LOCALAPPDATA 'DeskShot/settings.json'
 $settingsHash = if (Test-Path -LiteralPath $settingsPath) { (Get-FileHash -LiteralPath $settingsPath).Hash } else { $null }
-$arguments = @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', '/TASKS=', ('/DIR="' + $installationPath + '"'), ('/GROUP="' + $groupName + '"'))
+$arguments = @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', '/TASKS=', ('/DIR="' + $installationPath + '"'))
 function Invoke-TestSetup([string]$LogName) {
     $runArguments = $arguments + ('/LOG="' + (Join-Path $verificationRoot $LogName) + '"')
     $run = Start-Process -FilePath $installerPath -ArgumentList $runArguments -WindowStyle Hidden -Wait -PassThru

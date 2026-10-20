@@ -35,6 +35,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 [IO.Compression.ZipFile]::ExtractToDirectory($archivePath, $installStaging)
 $sourceFolder = Join-Path $installStaging 'DeskShot'
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'packaging/MANUAL.txt') -Destination (Join-Path $sourceFolder 'MANUAL.txt')
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'packaging/MANUAL.txt') -Destination (Join-Path $sourceFolder 'LEEME.txt')
 $runtimeHash = (Get-FileHash -LiteralPath $VCRedist -Algorithm SHA256).Hash.ToLowerInvariant()
 $runtimeNotice = "Microsoft Visual C++ x64 Redistributable`r`nOrigen: https://aka.ms/vc14/vc_redist.x64.exe`r`nVersion: $((Get-Item -LiteralPath $VCRedist).VersionInfo.FileVersion)`r`nSHA256: $runtimeHash`r`nCopyright Microsoft Corporation. Se incluye el instalador oficial sin modificar.`r`nLa instalacion y el uso se rigen por sus terminos de licencia.`r`n"
 [IO.File]::WriteAllText((Join-Path $sourceFolder 'ThirdParty/VisualCpp-Redistributable.txt'), $runtimeNotice, [Text.UTF8Encoding]::new($false))
