@@ -2,18 +2,30 @@
 
 ## Descarga para Windows x64
 
-Abre [la última versión publicada](https://github.com/JoseMoscol/deskshot/releases/latest) y descarga **DeskShot-0.5.0-win-x64.zip** en la sección **Assets**. Los archivos automáticos **Source code** contienen el proyecto para desarrolladores, no la aplicación preparada para ejecutar.
+Abre [la última versión publicada](https://github.com/JoseMoscol/deskshot/releases/latest). En **Assets**, elige **DeskShot-0.5.1-win-x64-Setup.exe** para instalar, o **DeskShot-0.5.1-win-x64.zip** para usarlo en modo portable. Los archivos automáticos **Source code** contienen el proyecto para desarrolladores, no la aplicación preparada para ejecutar.
 
-Esta edición incluye el runtime de .NET y los modelos OCR de español e inglés. No necesitas Visual Studio, el SDK ni instalar .NET por separado. Es una distribución **portable en ZIP**, sin asistente `Setup.exe`.
+Ambas ediciones incluyen el runtime de .NET y los modelos OCR de español e inglés. No necesitas Visual Studio, el SDK ni instalar .NET por separado.
 
-## Preparar la aplicación
+## Instalar con Setup.exe
+
+1. Cierra cualquier versión abierta desde el icono de DeskShot en la bandeja.
+2. Abre **DeskShot-0.5.1-win-x64-Setup.exe** y sigue el asistente en español.
+3. Elige la carpeta de destino. Por defecto se instala para tu usuario en `%LOCALAPPDATA%\Programs\DeskShot`.
+4. El acceso de Inicio se crea automáticamente. Puedes elegir también un acceso en el escritorio.
+5. Al terminar puedes abrir DeskShot desde el asistente o desde Inicio.
+
+El instalador incluye el redistribuible **Visual C++ x64 oficial de Microsoft** para el OCR y solo lo ejecuta si faltan bibliotecas compatibles. En ese caso Windows puede pedir permisos de administrador para esa dependencia; la aplicación se instala para tu usuario. No hace falta internet durante la instalación. Si el runtime requiere reiniciar, sigue el aviso del asistente y vuelve a ejecutar Setup cuando corresponda. Si la dependencia falla o no se autoriza, la instalación de DeskShot no continúa como si hubiese terminado correctamente.
+
+El instalador no cierra procesos a la fuerza. A partir de la versión 0.5.1, una instancia abierta bloquea la actualización o desinstalación: sal desde la bandeja y vuelve a intentarlo.
+
+## Alternativa: preparar el ZIP portable
 
 1. Usa Windows 11 de 64 bits (procesadores Intel o AMD). Para Windows 10, consulta las [ediciones compatibles con .NET 10](https://learn.microsoft.com/en-us/dotnet/core/install/windows#supported-versions). Esta descarga no es una compilación para Windows ARM64 ni para sistemas de 32 bits.
 2. Descarga el ZIP y selecciona **Extraer todo** en el Explorador. Extrae la carpeta completa en una ubicación permanente de tu usuario, por ejemplo `Documentos\Aplicaciones\DeskShot`.
 3. Entra en la carpeta extraída `DeskShot` y abre **DeskShot.exe**. No lo ejecutes dentro del ZIP ni muevas únicamente el `.exe`: necesita los archivos y las carpetas que lo acompañan.
 4. Opcionalmente, crea un acceso directo a `DeskShot.exe` desde el Explorador. La aplicación no necesita ejecutarse como administrador.
 
-El motor OCR nativo necesita **Microsoft Visual C++ Redistributable x64**. Muchos equipos ya lo tienen instalado. Si la extracción de texto muestra un error de dependencias nativas, instala el [paquete x64 oficial de Microsoft](https://aka.ms/vc14/vc_redist.x64.exe) y vuelve a abrir DeskShot. La información y los requisitos actuales de ese paquete están en la [documentación de Microsoft](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist). Una vez disponibles esas bibliotecas, el OCR funciona sin internet, sin cuentas y sin descargar idiomas.
+En el ZIP portable, el motor OCR nativo necesita **Microsoft Visual C++ Redistributable x64** disponible en el equipo. Si la extracción de texto muestra un error de dependencias nativas, instala el [paquete x64 oficial de Microsoft](https://aka.ms/vc14/vc_redist.x64.exe) y vuelve a abrir DeskShot. La información y los requisitos actuales de ese paquete están en la [documentación de Microsoft](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist). Una vez disponibles esas bibliotecas, el OCR funciona sin internet, sin cuentas y sin descargar idiomas.
 
 La aplicación todavía no tiene firma de código.
 
@@ -34,21 +46,23 @@ Por defecto, cerrar la ventana principal deja DeskShot en la bandeja del sistema
 ## Actualizar
 
 1. Sal de DeskShot desde la bandeja.
-2. Descarga y extrae el nuevo ZIP en otra carpeta.
-3. Abre el nuevo `DeskShot.exe` y actualiza tu acceso directo si corresponde.
+2. Si lo instalaste con Setup, ejecuta el instalador de la nueva versión: conservará la carpeta elegida y los accesos. No necesitas desinstalar antes.
+3. Si usas el ZIP portable, extrae la nueva versión en otra carpeta, abre su `DeskShot.exe` y actualiza tu acceso directo si corresponde.
 
 La configuración se conserva en `%LOCALAPPDATA%\DeskShot\settings.json`. Las capturas guardadas permanecen en la carpeta que elegiste. No hay un actualizador automático.
 
 ## Quitar la aplicación
 
-Sal de DeskShot y elimina la carpeta que extrajiste y sus accesos directos. Tus capturas y tu configuración se conservan por separado. Si también quieres restablecer las preferencias, elimina la carpeta `%LOCALAPPDATA%\DeskShot` después de cerrar la aplicación; no elimines tu carpeta de capturas salvo que también quieras borrar esas imágenes.
+Si lo instalaste con Setup, sal de DeskShot y usa **Configuración de Windows → Aplicaciones → DeskShot → Desinstalar**. Se quitan el programa y sus accesos; se conservan tus capturas, tus preferencias y el runtime compartido de Visual C++.
+
+Si usas el ZIP portable, sal de DeskShot y elimina la carpeta que extrajiste y sus accesos directos. Si también quieres restablecer las preferencias, elimina la carpeta `%LOCALAPPDATA%\DeskShot` después de cerrar la aplicación; no elimines tu carpeta de capturas salvo que también quieras borrar esas imágenes.
 
 ## Comprobar la descarga
 
-Cada Release incluye un archivo `.sha256` con la huella del ZIP. Puedes comprobarla desde PowerShell:
+Cada descarga incluye su archivo `.sha256`. Puedes comprobar el instalador desde PowerShell (para el ZIP usa su nombre):
 
 ```powershell
-Get-FileHash .\DeskShot-0.5.0-win-x64.zip -Algorithm SHA256
+Get-FileHash .\DeskShot-0.5.1-win-x64-Setup.exe -Algorithm SHA256
 ```
 
 El resultado debe coincidir con el valor del archivo publicado. Los archivos de aplicación y los modelos del OCR se incluyen dentro del ZIP; no debes descargar DLLs sueltas de otros sitios.

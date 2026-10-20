@@ -1,0 +1,35 @@
+DESKSHOT - INSTALACION Y USO
+
+El instalador copia la aplicacion en la carpeta Programs\DeskShot de tu
+usuario y crea un acceso en Inicio. El acceso en el escritorio es opcional.
+Incluye .NET y los idiomas del OCR. No necesitas el SDK ni Visual Studio.
+
+Si falta Visual C++ para el OCR, el instalador ejecuta el paquete oficial
+de Microsoft incluido. Windows puede pedir permisos de administrador
+para esa dependencia. No se necesita internet durante la instalacion.
+
+PRIMERA CAPTURA
+- Abre DeskShot desde Inicio o el escritorio.
+- Ctrl + Shift + 2 selecciona una region. Ajusta los bordes y anota.
+- Copiar o Guardar termina la captura. PNG conserva los detalles.
+- OCR extrae texto localmente en espanol e ingles.
+- En Configuracion puedes cambiar el atajo, la carpeta y PNG/JPG.
+
+DESPLAZAMIENTO
+Pon el documento al inicio y selecciona solo el contenido que se mueve.
+Excluye encabezados fijos y barras. Pulsa Desplazar > Iniciar captura.
+Esc termina y conserva lo capturado. La seleccion automatica del area
+y la exclusion automatica de encabezados todavia no estan implementadas.
+
+ACTUALIZAR Y QUITAR
+Antes de actualizar o desinstalar, sal de DeskShot desde la bandeja.
+Ejecuta el nuevo instalador para actualizar en la misma carpeta.
+Para quitarlo usa Configuracion de Windows > Aplicaciones > DeskShot.
+La desinstalacion conserva tus capturas y tus preferencias.
+Preferencias: %LOCALAPPDATA%\DeskShot\settings.json.
+
+La descarga ZIP sigue disponible para usar la aplicacion sin instalador.
+Todavia no hay firma de codigo ni actualizador automatico.
+
+Manual completo: https://github.com/JoseMoscol/deskshot/blob/main/docs/INSTALACION.md
+Descargas: https://github.com/JoseMoscol/deskshot/releases/latest

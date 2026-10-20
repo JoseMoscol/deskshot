@@ -20,6 +20,7 @@ public partial class App : System.Windows.Application
     private Forms.NotifyIcon? _tray;
     private System.Drawing.Icon? _trayIcon;
     private Mutex? _mutex;
+    private Mutex? _installerGuard;
     private bool _ownsMutex;
     private bool _capturing;
     private bool _trayHintShown;
@@ -41,6 +42,9 @@ public partial class App : System.Windows.Application
             Shutdown();
             return;
         }
+        // El instalador comprueba su existencia para no actualizar ni quitar
+        // una instancia que pueda tener capturas pendientes en el editor.
+        _installerGuard = new Mutex(false, "Local\\DeskShotInstallerGuard");
         Settings = _settingsStore.Load();
         Dashboard = new MainWindow(this);
         MainWindow = Dashboard;
@@ -216,6 +220,7 @@ public partial class App : System.Windows.Application
         _trayIcon?.Dispose();
         if (_ownsMutex) _mutex?.ReleaseMutex();
         _mutex?.Dispose();
+        _installerGuard?.Dispose();
         base.OnExit(e);
     }
 }
