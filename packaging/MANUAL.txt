@@ -14,6 +14,15 @@ PRIMERA CAPTURA
 - Copiar o Guardar termina la captura. PNG conserva los detalles.
 - OCR extrae texto localmente en espanol e ingles.
 - En Configuracion puedes cambiar el atajo, la carpeta y PNG/JPG.
+- C: censurar con un bloque opaco. X: pixelar. D: desenfocar.
+  Los filtros tienen intensidad ajustable. Para datos sensibles usa
+  un bloque solido. El OCR respeta las zonas censuradas.
+- N: hacer clic varias veces para numerar pasos. V: mover o cambiar
+  su tamano. El campo Paso permite editar el numero.
+- Anclar / Ctrl+I: crear una copia encima de otras ventanas. Arrastra
+  su barra, cambia zoom u opacidad. Ctrl+0 restablece la vista.
+  Copiar conserva la resolucion completa. Editor permite guardarla.
+  Esc cierra la referencia temporal; guardala antes si quieres conservarla.
 
 DESPLAZAMIENTO
 Pon el documento al inicio y selecciona solo el contenido que se mueve.

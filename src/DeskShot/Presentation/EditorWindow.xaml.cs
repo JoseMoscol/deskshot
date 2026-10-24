@@ -26,6 +26,7 @@ public partial class EditorWindow : Window
         if (copied) _copiedRevision = document.Revision;
         InitializeComponent();
         SurfaceHost.Child = _surface;
+        ExtraOptions.Bind(_surface);
         _surface.TextRequested += Surface_TextRequested;
         _surface.ToolChanged += (_, _) => ToolBox.SelectedIndex = (int)_surface.Tool;
         _surface.Editor.SelectionChanged += Selection_Changed;
@@ -34,7 +35,7 @@ public partial class EditorWindow : Window
         UpdateHistory();
         Loaded += (_, _) => FitImage();
         Closing += OnClosing;
-        Closed += (_, _) => { _document.Changed -= Document_Changed; _surface.Editor.Dispose(); };
+        Closed += (_, _) => { _document.Changed -= Document_Changed; ExtraOptions.Dispose(); _surface.Editor.Dispose(); };
     }
 
     private void Document_Changed(object? sender, EventArgs e)
@@ -56,6 +57,7 @@ public partial class EditorWindow : Window
     {
         _surface.Tool = (EditorTool)Math.Max(0, ToolBox.SelectedIndex);
         if (_surface.Tool != EditorTool.Select) _surface.Editor.Select(null);
+        Selection_Changed(this, EventArgs.Empty);
     }
     private void Color_Changed(object sender, SelectionChangedEventArgs e)
     {
@@ -66,7 +68,7 @@ public partial class EditorWindow : Window
     private void Width_Changed(object sender, SelectionChangedEventArgs e)
     {
         _surface.InkWidth = new double[] { 2, 4, 8, 12 }[Math.Clamp(WidthBox.SelectedIndex, 0, 3)];
-        if (!_syncControls && _surface.Editor.Selected is { Tool: not AnnotationTool.Text } selected)
+        if (!_syncControls && _surface.Editor.Selected is { Tool: AnnotationTool.Pen or AnnotationTool.Arrow or AnnotationTool.Rectangle or AnnotationTool.Highlight } selected)
             _surface.Editor.UpdateSelected(selected with { Width = _surface.InkWidth });
     }
     private void Selection_Changed(object? sender, EventArgs e)
@@ -78,17 +80,22 @@ public partial class EditorWindow : Window
         {
             DeleteButton.IsEnabled = selected is not null;
             EditTextButton.IsEnabled = selected?.Tool == AnnotationTool.Text;
-            WidthBox.IsEnabled = selected?.Tool != AnnotationTool.Text;
+            var tool = selected?.Tool;
+            ColorBox.IsEnabled = tool is null ? _surface.Tool is not (EditorTool.Pixelate or EditorTool.Blur) : tool is not (AnnotationTool.Pixelate or AnnotationTool.Blur);
+            WidthBox.IsEnabled = tool is null ? _surface.Tool is EditorTool.Pen or EditorTool.Arrow or EditorTool.Rectangle or EditorTool.Highlight : tool is AnnotationTool.Pen or AnnotationTool.Arrow or AnnotationTool.Rectangle or AnnotationTool.Highlight;
             if (selected is not null)
             {
                 ColorBox.SelectedIndex = Array.IndexOf(Palette, selected.Color);
-                if (selected.Tool != AnnotationTool.Text)
+                if (selected.Tool is AnnotationTool.Pen or AnnotationTool.Arrow or AnnotationTool.Rectangle or AnnotationTool.Highlight)
                     WidthBox.SelectedIndex = Array.IndexOf(new double[] { 2, 4, 8, 12 }, selected.Width);
             }
             SelectionHint.Text = selected?.Tool switch
             {
                 AnnotationTool.Arrow => "Flecha seleccionada · arrastra para mover o ajusta cualquiera de sus extremos.",
                 AnnotationTool.Text => $"Texto · {selected.FontSize:0.#} px · doble clic para editar, esquinas para cambiar tamaño.",
+                AnnotationTool.Redact => "Bloque opaco · mueve o ajusta sus esquinas para cubrir los datos. El OCR respeta esta zona.",
+                AnnotationTool.Pixelate or AnnotationTool.Blur => "Filtro seleccionado · ajusta su intensidad. Para ocultar información sensible usa un bloque sólido.",
+                AnnotationTool.Step => $"Paso {selected.StepNumber} · mueve, redimensiona o cambia su número. Pulsa N para seguir numerando.",
                 null => "Selecciona un objeto para moverlo o cambiar su tamaño. Texto (T): haz clic para escribir.",
                 _ => "Objeto seleccionado · arrastra para mover o usa las esquinas para cambiar su tamaño."
             };
@@ -145,10 +152,17 @@ public partial class EditorWindow : Window
     private async void SaveAs_Click(object sender, RoutedEventArgs e) => await SaveAsync(true);
     private async void Copy_Click(object sender, RoutedEventArgs e) => await CopyAsync();
     private void ExtractText_Click(object sender, RoutedEventArgs e) => ShowOcr();
+    private void Pin_Click(object sender, RoutedEventArgs e)
+    {
+        if (_outputBusy) return;
+        _surface.CancelGesture();
+        try { _app.PinImage(_app.Exporter.Render(_document)); EditorStatus.Text = "Copia anclada. Los cambios posteriores del editor no modifican esa copia."; }
+        catch (Exception ex) { EditorStatus.Text = "No se pudo anclar: " + ex.Message; }
+    }
     private void ShowOcr()
     {
         _surface.CancelGesture();
-        var window = new OcrWindow(_app.OcrEngine, _document.Original) { Owner = this };
+        var window = new OcrWindow(_app.OcrEngine, ImageExporter.RenderForOcr(_document)) { Owner = this };
         window.ShowDialog();
     }
 
@@ -218,6 +232,8 @@ public partial class EditorWindow : Window
 
     private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        if (Keyboard.FocusedElement is System.Windows.Controls.Primitives.TextBoxBase && Keyboard.Modifiers.HasFlag(ModifierKeys.Control)
+            && e.Key is Key.C or Key.X or Key.V or Key.A or Key.Z or Key.Y) return;
         if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
         {
             if (e.Key == Key.Escape)
@@ -241,10 +257,11 @@ public partial class EditorWindow : Window
                 var delta = e.Key switch { Key.Left => new Vector(-step, 0), Key.Right => new Vector(step, 0), Key.Up => new Vector(0, -step), _ => new Vector(0, step) };
                 _surface.Editor.Nudge(delta);
             }
-            else if (Keyboard.Modifiers == ModifierKeys.None && e.Key is Key.V or Key.P or Key.A or Key.R or Key.H or Key.T)
+            else if (Keyboard.Modifiers == ModifierKeys.None && e.Key is Key.V or Key.P or Key.A or Key.R or Key.H or Key.T or Key.C or Key.X or Key.D or Key.N)
             {
                 ToolBox.SelectedIndex = (int)(e.Key switch { Key.P => EditorTool.Pen, Key.A => EditorTool.Arrow,
-                    Key.R => EditorTool.Rectangle, Key.H => EditorTool.Highlight, Key.T => EditorTool.Text, _ => EditorTool.Select });
+                    Key.R => EditorTool.Rectangle, Key.H => EditorTool.Highlight, Key.T => EditorTool.Text,
+                    Key.C => EditorTool.Redact, Key.X => EditorTool.Pixelate, Key.D => EditorTool.Blur, Key.N => EditorTool.Step, _ => EditorTool.Select });
                 _surface.Focus();
             }
             else return;
@@ -256,6 +273,7 @@ public partial class EditorWindow : Window
             case Key.Z: _surface.CancelGesture(); _document.Undo(); break;
             case Key.Y: _surface.CancelGesture(); _document.Redo(); break;
             case Key.T: ShowOcr(); break;
+            case Key.I: Pin_Click(this, e); break;
             case Key.C: e.Handled = true; await CopyAsync(); return;
             case Key.S: e.Handled = true; await SaveAsync(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)); return;
             case Key.D0: _fit = true; FitImage(); break;

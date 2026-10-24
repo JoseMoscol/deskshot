@@ -31,7 +31,8 @@ public sealed class AnnotationEditor : IDisposable
     }
 
     public Annotation? HitTest(Point point, double tolerance) =>
-        _document.Annotations.Reverse().FirstOrDefault(a => AnnotationGeometry.HitTest(a, point, tolerance));
+        _document.Annotations.OrderBy(a => a.Tool == AnnotationTool.Redact ? 2 : a.Tool is AnnotationTool.Pixelate or AnnotationTool.Blur ? 1 : 0)
+            .Reverse().FirstOrDefault(a => AnnotationGeometry.HitTest(a, point, tolerance));
 
     public bool Begin(Point point, double tolerance)
     {

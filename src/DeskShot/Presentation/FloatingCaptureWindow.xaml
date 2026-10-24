@@ -1,6 +1,7 @@
 <Window x:Class="DeskShot.Presentation.FloatingCaptureWindow"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:local="clr-namespace:DeskShot.Presentation"
  Style="{StaticResource {x:Type Window}}" Title="DeskShot · Captura flotante"
  WindowStyle="None" ResizeMode="NoResize" ShowInTaskbar="False" Topmost="True" Background="Black"
  PreviewKeyDown="Window_PreviewKeyDown" Closing="Window_Closing">
@@ -26,6 +27,10 @@
       <Button x:Name="RectangleButton" Content="□" Tag="3" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Rectángulo (R)" AutomationProperties.Name="Rectángulo" />
       <Button x:Name="HighlightButton" Content="▰" Tag="4" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Resaltador (H)" AutomationProperties.Name="Resaltador" />
       <Button x:Name="TextButton" Content="T" Tag="5" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Añadir texto (T). Doble clic sobre un texto para editarlo." AutomationProperties.Name="Añadir texto" />
+      <Button x:Name="RedactButton" Content="■" Tag="6" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Censurar con bloque sólido (C)" AutomationProperties.Name="Censurar" />
+      <Button x:Name="PixelateButton" Content="▦" Tag="7" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Pixelar (X)" AutomationProperties.Name="Pixelar" />
+      <Button x:Name="BlurButton" Content="◌" Tag="8" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Desenfocar (D)" AutomationProperties.Name="Desenfocar" />
+      <Button x:Name="StepButton" Content="①" Tag="9" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Numerar pasos (N). Haz clic varias veces para continuar." AutomationProperties.Name="Numerar pasos" />
       <Button x:Name="ColorButton" Style="{StaticResource FloatingTool}" Click="Color_Click" ToolTip="Color y grosor" AutomationProperties.Name="Color y grosor"><Rectangle x:Name="ColorSwatch" Width="20" Height="20" Fill="#FF6B6B" Stroke="White" StrokeThickness="1" RadiusX="3" RadiusY="3" /></Button>
       <Border BorderBrush="#3A4759" BorderThickness="0,1,0,0" Margin="2,5" />
       <Button x:Name="UndoButton" Content="↶" Style="{StaticResource FloatingTool}" Click="Undo_Click" ToolTip="Deshacer (Ctrl+Z), incluido el ajuste del área" AutomationProperties.Name="Deshacer" />
@@ -40,6 +45,7 @@
      <Button x:Name="SaveButton" Content="Guardar" Click="Save_Click" Padding="13,9" Margin="2" ToolTip="Guardar y terminar (Ctrl+S). Ctrl+Shift+S: guardar como." />
      <Button Content="OCR" Click="Ocr_Click" Padding="13,9" Margin="2" ToolTip="Extraer texto de la región original, sin conexión (Ctrl+T)" />
      <Button Content="Editor" Click="Editor_Click" Padding="13,9" Margin="2" ToolTip="Continuar en el editor completo (Ctrl+E)" />
+     <Button Content="Anclar" Click="Pin_Click" Padding="13,9" Margin="2" ToolTip="Anclar una copia y terminar (Ctrl+I)" />
      <Button x:Name="ScrollButton" Content="Desplazar" Click="Scroll_Click" Padding="13,9" Margin="2" ToolTip="Capturar hacia abajo en la ventana real. Selecciona solo el contenido desplazable, sin anotaciones." />
      <Button Content="×" Click="Cancel_Click" Padding="13,9" Margin="2" ToolTip="Cancelar captura (Esc)" AutomationProperties.Name="Cancelar captura" />
     </WrapPanel>
@@ -52,7 +58,7 @@
    <Border Background="#17212E" BorderBrush="#536275" BorderThickness="1" CornerRadius="8" Padding="14">
     <StackPanel>
      <TextBlock Text="COLOR" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,0,0,8" />
-     <StackPanel Orientation="Horizontal">
+     <StackPanel x:Name="PalettePanel" Orientation="Horizontal">
       <Button Width="28" Height="28" Padding="0" Margin="2" Background="#FF6B6B" Tag="0" Click="Palette_Click" ToolTip="Coral" AutomationProperties.Name="Coral" />
       <Button Width="28" Height="28" Padding="0" Margin="2" Background="#78E7C3" Tag="1" Click="Palette_Click" ToolTip="Menta" AutomationProperties.Name="Menta" />
       <Button Width="28" Height="28" Padding="0" Margin="2" Background="#FFDC46" Tag="2" Click="Palette_Click" ToolTip="Amarillo" AutomationProperties.Name="Amarillo" />
@@ -64,6 +70,7 @@
      <ComboBox x:Name="WidthBox" SelectedIndex="1" SelectionChanged="Width_Changed" AutomationProperties.Name="Grosor de anotación">
       <ComboBoxItem Content="2 px" /><ComboBoxItem Content="4 px" /><ComboBoxItem Content="8 px" /><ComboBoxItem Content="12 px" />
      </ComboBox>
+     <local:AnnotationOptions x:Name="ExtraOptions" Margin="0,12,0,0" />
     </StackPanel>
    </Border>
   </Popup>

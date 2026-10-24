@@ -24,6 +24,13 @@ USO RAPIDO
   el contenido que se mueve y pulsar Desplazar > Iniciar captura.
   Esc termina y conserva lo unido hasta ese momento.
 - Configuracion: atajo, carpeta, formato PNG/JPG y otras preferencias.
+- C: bloque opaco de censura. X: pixelado. D: desenfoque. Ajusta la
+  intensidad de los filtros. Para datos sensibles usa un bloque solido.
+  El OCR respeta las zonas censuradas.
+- N: numerar pasos consecutivos. V: mover o redimensionar los objetos.
+- Anclar / Ctrl+I: referencia siempre visible, con zoom y opacidad.
+  Arrastra su barra para moverla. Ctrl+0 restablece. Esc cierra.
+  Copiar conserva la resolucion original. Editor permite guardarla.
 
 CIERRE Y ACTUALIZACION
 Cerrar la ventana normalmente mantiene DeskShot en la bandeja.

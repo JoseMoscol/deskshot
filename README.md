@@ -4,15 +4,15 @@ Aplicación de escritorio para **Windows**, escrita en **C# / .NET 10 / WPF**. C
 
 ## Descargar y ejecutar
 
-Descarga la aplicación preparada desde **[Releases · última versión](https://github.com/JoseMoscol/deskshot/releases/latest)**. Elige **DeskShot-0.5.1-win-x64-Setup.exe** para instalarla con asistente en español, acceso en Inicio y desinstalador. Se instala para tu usuario e incluye .NET, los idiomas OCR y el redistribuible oficial de Visual C++ x64, que solo se ejecuta cuando falta. Esa dependencia puede pedir permisos de administrador.
+Descarga la aplicación preparada desde **[Releases · última versión](https://github.com/JoseMoscol/deskshot/releases/latest)**. Elige **DeskShot-0.6.0-win-x64-Setup.exe** para instalarla con asistente en español, acceso en Inicio y desinstalador. Se instala para tu usuario e incluye .NET, los idiomas OCR y el redistribuible oficial de Visual C++ x64, que solo se ejecuta cuando falta. Esa dependencia puede pedir permisos de administrador.
 
-También está disponible **DeskShot-0.5.1-win-x64.zip**: usa **Extraer todo** y abre `DeskShot.exe` dentro de la carpeta extraída. Conserva todos sus archivos. Las dos ediciones incluyen .NET y los modelos OCR: no requieren Visual Studio, el SDK ni instalar .NET por separado. El ZIP necesita Visual C++ x64 disponible en el equipo. Los archivos automáticos Source code contienen el proyecto para compilar. Todavía no hay firma de código ni actualizador automático.
+También está disponible **DeskShot-0.6.0-win-x64.zip**: usa **Extraer todo** y abre `DeskShot.exe` dentro de la carpeta extraída. Conserva todos sus archivos. Las dos ediciones incluyen .NET y los modelos OCR: no requieren Visual Studio, el SDK ni instalar .NET por separado. El ZIP necesita Visual C++ x64 disponible en el equipo. Los archivos automáticos Source code contienen el proyecto para compilar. Todavía no hay firma de código ni actualizador automático.
 
 **[Manual de descarga, uso, actualización y desinstalación](docs/INSTALACION.md).**
 
 ## Ejecutar desde el proyecto
 
-Abre `artifacts/DeskShot-0.5.1/DeskShot.exe`, o haz doble clic en `Iniciar DeskShot.cmd` desde la raíz del proyecto. El lanzador compila si todavía no existe el ejecutable publicado. Si la versión anterior sigue en la bandeja, elige **Salir** en su menú antes de abrir esta actualización. La publicación separada conserva intactos los archivos de la instancia anterior y ambas versiones comparten la configuración existente.
+Abre `artifacts/DeskShot-0.6.0/DeskShot.exe`, o haz doble clic en `Iniciar DeskShot.cmd` desde la raíz del proyecto. El lanzador compila si todavía no existe el ejecutable publicado. Si la versión anterior sigue en la bandeja, elige **Salir** en su menú antes de abrir esta actualización. La publicación separada conserva intactos los archivos de la instancia anterior y ambas versiones comparten la configuración existente.
 
 - Para ejecutar: **.NET 10 Desktop Runtime** y una sesión interactiva de Windows 10/11.
 - El motor OCR nativo requiere **Microsoft Visual C++ Redistributable 2015–2022** de la arquitectura del proceso (x64 en este equipo). Sus bibliotecas ya estaban instaladas y se verificó el funcionamiento real del motor.
@@ -42,6 +42,17 @@ En **Configuración** puedes elegir:
 - Continuar en la bandeja del sistema al cerrar la ventana principal. El menú de la bandeja permite capturar, abrir la aplicación o salir.
 
 La copia automática está activada inicialmente; el guardado automático está desactivado. Elegir una región en modo flotante no copia ni guarda por sí solo: puedes ajustar y anotar antes de terminar. Si editas después en el editor completo, vuelve a copiar o guardar para conservar esa versión. Al cerrar un editor completo con cambios pendientes aparece una confirmación.
+
+## Censura, pasos y capturas ancladas
+
+- **Censurar (C):** arrastra un bloque opaco, negro inicialmente, para ocultar una zona. Puedes cambiar su color, moverlo y ajustar sus esquinas. El bloque cubre también las anotaciones que queden debajo, incluso si las dibujaste después.
+- **Pixelar (X) / Desenfocar (D):** arrastra el área y ajusta la **Intensidad (px)** del filtro. En el modo flotante está en el panel de color y grosor; en el editor completo aparece en la barra de propiedades. Un bloque sólido es la opción para ocultar información sensible: el pixelado y el desenfoque pueden dejar contenido reconocible.
+- Las censuras son editables y se pueden deshacer mientras el editor está abierto. Guardar, copiar y anclar generan una imagen compuesta, sin capas editables ni una copia del original dentro del archivo. **El OCR respeta las zonas censuradas**; las otras anotaciones no se incluyen en la extracción. Los recortes mantienen el mismo resultado al pasar del modo flotante al editor completo.
+- **Pasos (N):** haz clic varias veces para añadir círculos numerados consecutivos. Selecciona con **V** para moverlos o redimensionarlos sin deformarlos. El campo **Paso → Aplicar número** permite editar un número (1–9999); el siguiente seguirá al mayor número existente. Eliminar un paso no renumera los demás. La edición y la numeración participan en deshacer/rehacer.
+- **Anclar / Ctrl+I:** crea una copia independiente que permanece encima de otras ventanas. Arrastra su barra para moverla, ajusta el tamaño de la ventana, el zoom o la opacidad. **Ctrl+0** restablece la vista y la opacidad; **Esc** cierra la referencia.
+- En una captura anclada, **Copiar / Ctrl+C** copia toda la imagen a resolución original: el zoom y la opacidad no cambian sus píxeles. **Editor** abre esa imagen para guardarla o seguir anotando. La copia anclada ya está compuesta; sus anotaciones anteriores no se editan por separado. Los cambios posteriores del editor original no modifican la copia.
+
+Anclar desde el modo flotante termina la selección y conserva la imagen en la ventana anclada. Desde el editor completo mantiene el editor abierto. Una referencia anclada es temporal: cópiala o guárdala desde su editor antes de cerrarla si quieres conservarla. Las referencias se ocultan durante las nuevas capturas junto con las demás ventanas de DeskShot.
 
 ## Captura con desplazamiento
 
@@ -93,7 +104,7 @@ tests/DeskShot.Tests/  Pruebas ejecutables y previsualizaciones de la interfaz
 
 `CaptureDocument` conserva una imagen original inmutable, una región de recorte y anotaciones con identificadores estables. El historial guarda estados del recorte y las anotaciones, sin duplicar la imagen original. Restaurar una revisión guardada también restaura su identidad para que no se marque como una edición pendiente. `AnnotationEditor` controla selección, vista previa y confirmación de gestos en píxeles; `AnnotationGeometry` y `RegionGeometry` se ocupan de los tiradores y transformaciones. El lienzo y la exportación comparten el dibujo de anotaciones y texto. `CreateRegionDocument` traslada las coordenadas al recorte para continuar en el editor completo sin cambiar la imagen resultante.
 
-**OCR local implementado:** `TesseractOcrEngine` implementa `IOcrEngine.RecognizeAsync`, procesa en segundo plano y devuelve texto y regiones en píxeles mediante `OcrResult`. Usa Tesseract 5.2.0 con los modelos LSTM `spa` y `eng` de `tessdata_fast`, incluidos en `tessdata/`. Las capturas pequeñas se amplían internamente para facilitar la lectura; los resultados vuelven a las coordenadas originales y la captura no se modifica. El OCR usa la imagen original, sin flechas ni trazos añadidos en el editor.
+**OCR local implementado:** `TesseractOcrEngine` implementa `IOcrEngine.RecognizeAsync`, procesa en segundo plano y devuelve texto y regiones en píxeles mediante `OcrResult`. Usa Tesseract 5.2.0 con los modelos LSTM `spa` y `eng` de `tessdata_fast`, incluidos en `tessdata/`. Las capturas pequeñas se amplían internamente para facilitar la lectura; los resultados vuelven a las coordenadas originales y la captura no se modifica. La extracción usa `ImageExporter.RenderForOcr`: original y recorte con las censuras aplicadas, omitiendo flechas, pasos y demás anotaciones.
 
 La extracción se realiza en memoria, sin guardar una copia temporal de la captura, sin enviar imágenes y sin descargar modelos al ejecutar. No requiere cuenta ni clave de API. Se conservan los saltos de línea; la exactitud depende del tamaño y contraste del texto. El texto impreso nítido es el caso principal; tablas complejas, texto inclinado y escritura a mano pueden requerir correcciones.
 
@@ -111,7 +122,7 @@ Para generar también Setup.exe, usa `./build-installer.ps1 -Compiler RUTA/ISCC.
 
 `./verify-installer.ps1 -Installer RUTA/Setup.exe` prueba instalación, bloqueo de una instancia abierta, reinstalación y desinstalación. Usa una carpeta temporal del workspace y comprueba los accesos reales de Inicio; requiere que no exista otra instalación registrada ni un grupo de Inicio DeskShot y que Visual C++ ya esté disponible. Retira la copia de prueba al terminar, también si una comprobación falla. No prueba la instalación elevada del redistribuible. Comprueba que se conserven las preferencias del usuario y los archivos ajenos al programa.
 
-Para preparar la descarga portable de Windows x64, ejecuta `./package-release.ps1`. Publica con .NET incluido, valida los archivos necesarios y ejecuta las pruebas con un verificador autocontenido que utiliza exactamente la misma DLL de DeskShot. Genera el ZIP y su SHA-256 en `artifacts/releases/v0.5.1`. No sobrescribe paquetes existentes; los archivos temporales y las evidencias quedan en `artifacts/release-staging/`. La primera ejecución puede descargar los paquetes oficiales del runtime desde NuGet. `-SkipTests` omite las pruebas y se reserva para un paquete que ya se haya verificado.
+Para preparar la descarga portable de Windows x64, ejecuta `./package-release.ps1`. Publica con .NET incluido, valida los archivos necesarios y ejecuta las pruebas con un verificador autocontenido que utiliza exactamente la misma DLL de DeskShot. Genera el ZIP y su SHA-256 en `artifacts/releases/v0.6.0`. No sobrescribe paquetes existentes; los archivos temporales y las evidencias quedan en `artifacts/release-staging/`. La primera ejecución puede descargar los paquetes oficiales del runtime desde NuGet. `-SkipTests` omite las pruebas y se reserva para un paquete que ya se haya verificado.
 
 Desde PowerShell:
 
@@ -121,17 +132,19 @@ Desde PowerShell:
 .\build.ps1 -CheckDesktop
 ```
 
-El script compila, ejecuta las pruebas y publica en `artifacts/DeskShot-0.5.1`. Las pruebas verifican selección, historial, independencia del original, PNG 4K píxel a píxel, dimensiones y firmas JPG, anotaciones, configuración, atajos y render de la interfaz. También comprueban selección por orden de capas, tiradores solapados, movimiento y redimensionado con límites, un deshacer por gesto, cancelación, edición de texto, eliminación y controles de propiedades. El modo flotante añade pruebas de los ocho tiradores, ajuste de bordes, recorte exacto, historial de región, posición de las barras y continuidad con el editor. Ejecutan OCR real tanto de imágenes completas como de regiones anotadas, usando el original. Las previsualizaciones y resultados se generan en `artifacts/verification`.
+El script compila, ejecuta las pruebas y publica en `artifacts/DeskShot-0.6.0`. Las pruebas verifican selección, historial, independencia del original, PNG 4K píxel a píxel, dimensiones y firmas JPG, anotaciones, configuración, atajos y render de la interfaz. También comprueban selección por orden de capas, tiradores solapados, movimiento y redimensionado con límites, un deshacer por gesto, cancelación, edición de texto, eliminación y controles de propiedades. El modo flotante añade pruebas de los ocho tiradores, ajuste de bordes, recorte exacto, historial de región, posición de las barras y continuidad con el editor. Ejecutan OCR real tanto de imágenes completas como de regiones anotadas, usando el original. Las previsualizaciones y resultados se generan en `artifacts/verification`.
 
 Comandos individuales:
 
 ```powershell
 dotnet build DeskShot.slnx -c Release -m:1 -nr:false
 dotnet tests/DeskShot.Tests/bin/Release/net10.0-windows/DeskShot.Tests.dll artifacts/verification
-dotnet publish src/DeskShot/DeskShot.csproj -c Release --self-contained false -o artifacts/DeskShot-0.5.1 -m:1 -nr:false
+dotnet publish src/DeskShot/DeskShot.csproj -c Release --self-contained false -o artifacts/DeskShot-0.6.0 -m:1 -nr:false
 ```
 
 El registro real de atajos requiere una sesión interactiva de Windows con permiso para `RegisterHotKey`; un entorno aislado puede bloquearlo. La prueba libera sus atajos al terminar. Las previsualizaciones usan contenido sintético, no capturas del usuario.
+
+Las pruebas de la versión 0.6 añaden opacidad real de los bloques, prioridad de censura, píxeles no afectados, promedios de pixelado, desenfoque uniforme, cambio de intensidad, recortes sucesivos, selección e historial de pasos, OCR real antes y después de censurar, controles compartidos y aislamiento de la imagen anclada frente al zoom y la opacidad. `--features-demo` abre un editor con contenido sintético para una comprobación interactiva. Se verificaron en Windows la creación consecutiva de pasos, censura, anclado, desplazamiento de la referencia, opacidad y restablecimiento de vista, sin usar capturas personales ni modificar el portapapeles.
 
 Las pruebas de desplazamiento comprueban las uniones píxel a píxel, el último avance de un píxel, patrones ambiguos, encabezados fijos, saltos sin solapamiento, límites, cancelación y conservación del resultado parcial. También exportan y anotan una imagen de 22 000 px y ejecutan OCR real en otra de 34 000 px, con texto al inicio, en un bloque intermedio y al final.
 

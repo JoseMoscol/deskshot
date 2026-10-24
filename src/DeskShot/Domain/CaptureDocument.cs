@@ -1,6 +1,6 @@
 namespace DeskShot.Domain;
 
-public enum AnnotationTool { Pen, Arrow, Rectangle, Highlight, Text }
+public enum AnnotationTool { Pen, Arrow, Rectangle, Highlight, Text, Redact, Pixelate, Blur, Step }
 
 // Las coordenadas y el grosor siempre se guardan en píxeles de la imagen original.
 public sealed record Annotation(AnnotationTool Tool, Color Color, double Width, IReadOnlyList<Point> Points)
@@ -9,6 +9,8 @@ public sealed record Annotation(AnnotationTool Tool, Color Color, double Width, 
     public string Text { get; init; } = "";
     public double FontSize { get; init; } = 32;
     public bool IsBold { get; init; }
+    public int EffectSize { get; init; } = 12;
+    public int StepNumber { get; init; } = 1;
 }
 
 public sealed class CaptureDocument
@@ -19,6 +21,8 @@ public sealed class CaptureDocument
     private readonly Stack<State> _redo = [];
     private long _nextRevision;
     public BitmapSource Original { get; }
+    internal BitmapSource EffectSource { get; init; }
+    internal Point EffectOffset { get; init; }
     public IReadOnlyList<Annotation> Annotations => _annotations.AsReadOnly();
     public DateTime CreatedAt { get; } = DateTime.Now;
     public int Width => Original.PixelWidth;
@@ -26,6 +30,7 @@ public sealed class CaptureDocument
     public bool CanUndo => _undo.Count > 0;
     public bool CanRedo => _redo.Count > 0;
     public long Revision { get; private set; }
+    public int NextStepNumber => _annotations.Where(a => a.Tool == AnnotationTool.Step).Select(a => a.StepNumber).DefaultIfEmpty(0).Max() + 1;
     public Int32Rect Region { get; private set; }
     public event EventHandler? Changed;
 
@@ -35,6 +40,7 @@ public sealed class CaptureDocument
         // Aislamos el documento de cambios externos en un WriteableBitmap.
         Original = original.Clone();
         Original.Freeze();
+        EffectSource = Original;
         Region = new Int32Rect(0, 0, Width, Height);
     }
 
@@ -57,7 +63,7 @@ public sealed class CaptureDocument
 
     public CaptureDocument CreateRegionDocument()
     {
-        var result = new CaptureDocument(OriginalRegion());
+        var result = new CaptureDocument(OriginalRegion()) { EffectSource = EffectSource, EffectOffset = new Point(EffectOffset.X + Region.X, EffectOffset.Y + Region.Y) };
         var crop = new Rect(Region.X, Region.Y, Region.Width, Region.Height);
         foreach (var annotation in Annotations)
         {
@@ -89,6 +95,7 @@ public sealed class CaptureDocument
         var current = _annotations[index];
         if (current.Tool == frozen.Tool && current.Color == frozen.Color && current.Width == frozen.Width &&
             current.Text == frozen.Text && current.FontSize == frozen.FontSize && current.IsBold == frozen.IsBold &&
+            current.EffectSize == frozen.EffectSize && current.StepNumber == frozen.StepNumber &&
             current.Points.SequenceEqual(frozen.Points)) return;
         Commit(() => _annotations[index] = frozen);
     }
@@ -108,6 +115,8 @@ public sealed class CaptureDocument
         if (annotation.Tool == AnnotationTool.Text && (string.IsNullOrWhiteSpace(annotation.Text) || annotation.Text.Length > 5000 ||
             !double.IsFinite(annotation.FontSize) || annotation.FontSize < 4 || annotation.FontSize > 4096))
             throw new ArgumentException("Introduce texto de hasta 5000 caracteres y un tamaño entre 4 y 4096 píxeles.");
+        if (annotation.EffectSize is < 2 or > 64 || annotation.StepNumber is < 1 or > 9999)
+            throw new ArgumentException("La intensidad debe estar entre 2 y 64 y el número entre 1 y 9999.");
         return annotation with { Points = Array.AsReadOnly(annotation.Points.ToArray()) };
     }
 

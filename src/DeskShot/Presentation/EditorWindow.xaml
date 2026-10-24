@@ -1,6 +1,7 @@
 <Window x:Class="DeskShot.Presentation.EditorWindow"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:local="clr-namespace:DeskShot.Presentation"
  Style="{StaticResource {x:Type Window}}"
  Title="DeskShot · Editor" Width="1180" Height="820" MinWidth="960" MinHeight="620" WindowStartupLocation="CenterScreen"
  PreviewKeyDown="Window_PreviewKeyDown">
@@ -11,6 +12,7 @@
    <StackPanel><TextBlock Text="Tu captura, a tu manera." FontSize="23" FontWeight="SemiBold" /><TextBlock x:Name="DimensionsText" Foreground="{StaticResource MutedBrush}" Margin="0,6,0,0" /></StackPanel>
    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
     <Button Content="Copiar" Click="Copy_Click" ToolTip="Copiar la imagen editada (Ctrl+C)" Margin="0,0,8,0" />
+    <Button Content="Anclar" Click="Pin_Click" ToolTip="Anclar esta versión encima de otras ventanas (Ctrl+I)" Margin="0,0,8,0" />
     <Button Content="Guardar como…" Click="SaveAs_Click" ToolTip="Elegir nombre y formato (Ctrl+Shift+S)" Margin="0,0,8,0" />
     <Button Content="Guardar" Click="Save_Click" Style="{StaticResource AccentButton}" ToolTip="Guardar en tu carpeta configurada (Ctrl+S)" />
    </StackPanel>
@@ -20,6 +22,7 @@
    <WrapPanel VerticalAlignment="Center">
     <ComboBox x:Name="ToolBox" Width="158" SelectedIndex="0" SelectionChanged="Tool_Changed" AutomationProperties.Name="Herramienta de anotación" Margin="0,0,10,0">
      <ComboBoxItem Content="Seleccionar (V)" /><ComboBoxItem Content="Lápiz (P)" /><ComboBoxItem Content="Flecha (A)" /><ComboBoxItem Content="Rectángulo (R)" /><ComboBoxItem Content="Resaltador (H)" /><ComboBoxItem Content="Texto (T)" />
+     <ComboBoxItem Content="Censurar (C)" /><ComboBoxItem Content="Pixelar (X)" /><ComboBoxItem Content="Desenfocar (D)" /><ComboBoxItem Content="Pasos (N)" />
     </ComboBox>
     <ComboBox x:Name="ColorBox" Width="120" SelectedIndex="0" SelectionChanged="Color_Changed" AutomationProperties.Name="Color de anotación" Margin="0,0,10,0">
      <ComboBoxItem Content="Coral" /><ComboBoxItem Content="Menta" /><ComboBoxItem Content="Amarillo" /><ComboBoxItem Content="Azul" /><ComboBoxItem Content="Blanco" /><ComboBoxItem Content="Negro" />
@@ -35,6 +38,7 @@
     </ComboBox>
     <Button Content="Extraer texto" Click="ExtractText_Click" ToolTip="OCR local en español e inglés (Ctrl+T)" Margin="16,0,0,0" Padding="16,9" />
    </WrapPanel>
+   <local:AnnotationOptions x:Name="ExtraOptions" Margin="0,8,0,0" />
    <Grid Margin="0,10,0,0">
     <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
     <TextBlock x:Name="SelectionHint" Text="Selecciona un objeto para moverlo o cambiar su tamaño. Texto (T): haz clic para escribir." Foreground="{StaticResource MutedBrush}" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,0,14,0" />

@@ -24,6 +24,7 @@ internal static partial class Program
         var app = new App(verificationMode: true);
         app.InitializeComponent();
         if (args.Contains("--floating-demo")) return ShowFloatingDemo(app);
+        if (args.Contains("--features-demo")) return ShowFeaturesDemo(app);
         if (args.Contains("--scroll-document")) return ShowScrollDocument(app);
         if (args.Contains("--scroll-demo")) return ShowScrollDemo(app);
         if (args.Contains("--verify-scroll-demo")) { Run("Documento real: 24 secciones capturadas y OCR local", TestRealScrollResult); return _failed == 0 ? 0 : 1; }
@@ -62,6 +63,13 @@ internal static partial class Program
         Run("Captura larga: PNG, anotaciones y editor a resolución nativa", () => TestLongCapture(app));
         Run("Interfaz de captura con desplazamiento", () => TestScrollWindow(app));
         Run("OCR local de captura larga por bloques y coordenadas originales", TestLongOcr);
+        Run("Censura sólida: opaca, prioritaria y sin modificar el original", TestSolidRedaction);
+        Run("Pixelado y desenfoque: bordes, intensidad y píxeles fuera intactos", TestRedactionFilters);
+        Run("Censura y recorte: continuidad exacta al abrir el editor", TestRedactionCrop);
+        Run("Pasos: numeración, edición, tamaño e historial", TestSteps);
+        Run("OCR local respeta censura y omite otras anotaciones", TestRedactedOcr);
+        Run("Anclado: copia independiente, zoom y opacidad", () => TestPinnedCapture(app));
+        Run("Interfaz: censura, pasos y propiedades compartidas", () => TestFeatureControls(app));
         if (args.Contains("--desktop")) Run("Captura real del escritorio a dimensiones nativas", TestDesktopCapture);
         Console.WriteLine($"\n{_passed} pruebas correctas; {_failed} fallidas. Evidencias: {_output}");
         return _failed == 0 ? 0 : 1;

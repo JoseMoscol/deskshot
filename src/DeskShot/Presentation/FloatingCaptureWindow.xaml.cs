@@ -37,6 +37,7 @@ public partial class FloatingCaptureWindow : Window
         _surface = new AnnotationSurface(Document);
         _chrome = new CaptureChrome(Document.Width, Document.Height);
         InitializeComponent();
+        ExtraOptions.Bind(_surface);
         if (scrolling) Status("Captura con desplazamiento: selecciona solo el contenido que se mueve, excluyendo encabezados y barras. Pulsa Desplazar para continuar.");
         SurfaceHost.Children.Add(_surface);
         ChromeHost.Children.Add(_chrome);
@@ -52,7 +53,7 @@ public partial class FloatingCaptureWindow : Window
                 throw new InvalidOperationException("No se pudo mostrar el modo de captura flotante.");
             Activate(); Focus(); RefreshRegion();
         };
-        Closed += (_, _) => { Document.Changed -= Document_Changed; _surface.Editor.Dispose(); };
+        Closed += (_, _) => { Document.Changed -= Document_Changed; ExtraOptions.Dispose(); _surface.Editor.Dispose(); };
         if (selectWholeDesktop) SelectRegion(new Int32Rect(0, 0, Document.Width, Document.Height));
         RefreshToolButtons(); RefreshProperties();
     }
@@ -194,8 +195,10 @@ public partial class FloatingCaptureWindow : Window
     private void SetAreaMode()
     {
         _surface.CancelGesture(); _surface.Editor.Select(null);
+        _surface.Tool = EditorTool.Select;
         _areaMode = true;
         RefreshToolButtons();
+        RefreshProperties();
         Root.Focus();
     }
     private void Tool_Click(object sender, RoutedEventArgs e) => SetTool((EditorTool)int.Parse((string)((Button)sender).Tag));
@@ -211,7 +214,7 @@ public partial class FloatingCaptureWindow : Window
     private void RefreshToolButtons()
     {
         if (AreaButton is null) return;
-        var buttons = new[] { SelectButton, PenButton, ArrowButton, RectangleButton, HighlightButton, TextButton };
+        var buttons = new[] { SelectButton, PenButton, ArrowButton, RectangleButton, HighlightButton, TextButton, RedactButton, PixelateButton, BlurButton, StepButton };
         void Style(Button button, bool active)
         {
             button.Background = active ? new SolidColorBrush(Color.FromRgb(120, 231, 195)) : Brushes.Transparent;
@@ -233,10 +236,12 @@ public partial class FloatingCaptureWindow : Window
             if (selected is not null)
             {
                 _surface.InkColor = selected.Color;
-                if (selected.Tool != AnnotationTool.Text)
+                if (selected.Tool is AnnotationTool.Pen or AnnotationTool.Arrow or AnnotationTool.Rectangle or AnnotationTool.Highlight)
                     WidthBox.SelectedIndex = Array.IndexOf(new double[] { 2, 4, 8, 12 }, selected.Width);
             }
-            WidthBox.IsEnabled = selected?.Tool != AnnotationTool.Text;
+            WidthBox.IsEnabled = selected is null ? _surface.Tool is EditorTool.Pen or EditorTool.Arrow or EditorTool.Rectangle or EditorTool.Highlight
+                : selected.Tool is AnnotationTool.Pen or AnnotationTool.Arrow or AnnotationTool.Rectangle or AnnotationTool.Highlight;
+            PalettePanel.IsEnabled = selected is null ? _surface.Tool is not (EditorTool.Pixelate or EditorTool.Blur) : selected.Tool is not (AnnotationTool.Pixelate or AnnotationTool.Blur);
             ColorSwatch.Fill = new SolidColorBrush(_surface.InkColor);
         }
         finally { _syncProperties = false; }
@@ -251,7 +256,7 @@ public partial class FloatingCaptureWindow : Window
     private void Width_Changed(object sender, SelectionChangedEventArgs e)
     {
         _surface.InkWidth = new double[] { 2, 4, 8, 12 }[Math.Clamp(WidthBox.SelectedIndex, 0, 3)];
-        if (!_syncProperties && _surface.Editor.Selected is { Tool: not AnnotationTool.Text } selected)
+        if (!_syncProperties && _surface.Editor.Selected is { Tool: AnnotationTool.Pen or AnnotationTool.Arrow or AnnotationTool.Rectangle or AnnotationTool.Highlight } selected)
             _surface.Editor.UpdateSelected(selected with { Width = _surface.InkWidth });
     }
     private void Undo_Click(object sender, RoutedEventArgs e) { _surface.CancelGesture(); Document.Undo(); }
@@ -345,9 +350,21 @@ public partial class FloatingCaptureWindow : Window
     {
         if (_busy || !_hasSelection) return;
         _surface.CancelGesture();
-        new OcrWindow(_app.OcrEngine, Document.OriginalRegion()) { Owner = this, Topmost = true }.ShowDialog();
+        new OcrWindow(_app.OcrEngine, ImageExporter.RenderForOcr(Document)) { Owner = this, Topmost = true }.ShowDialog();
     }
     private void Editor_Click(object sender, RoutedEventArgs e) => OpenEditor();
+    private void Pin_Click(object sender, RoutedEventArgs e)
+    {
+        if (_busy || !_hasSelection) return;
+        _surface.CancelGesture();
+        try
+        {
+            _app.PinImage(_app.Exporter.Render(Document));
+            CompletionMessage = "Captura anclada. Puedes copiarla o abrirla en el editor desde su barra.";
+            ResultAction = FloatingCaptureAction.Completed; DialogResult = true;
+        }
+        catch (Exception ex) { Status("No se pudo anclar: " + ex.Message); }
+    }
     private void Scroll_Click(object sender, RoutedEventArgs e)
     {
         if (_busy || !_hasSelection) return;
@@ -369,6 +386,8 @@ public partial class FloatingCaptureWindow : Window
     }
     private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        if (Keyboard.FocusedElement is TextBoxBase && Keyboard.Modifiers.HasFlag(ModifierKeys.Control)
+            && e.Key is Key.C or Key.X or Key.V or Key.A or Key.Z or Key.Y) return;
         if (_busy) { e.Handled = true; return; }
         if (e.Key == Key.Escape)
         {
@@ -388,6 +407,7 @@ public partial class FloatingCaptureWindow : Window
                 case Key.S: e.Handled = true; await OutputAsync(true, Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)); return;
                 case Key.T: ShowOcr(); break;
                 case Key.E: OpenEditor(); break;
+                case Key.I: Pin_Click(this, e); break;
                 case Key.Z: _surface.CancelGesture(); Document.Undo(); break;
                 case Key.Y: _surface.CancelGesture(); Document.Redo(); break;
                 default: return;
@@ -407,9 +427,10 @@ public partial class FloatingCaptureWindow : Window
             else _surface.Editor.Nudge(delta);
         }
         else if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.B) SetAreaMode();
-        else if (Keyboard.Modifiers == ModifierKeys.None && e.Key is Key.V or Key.P or Key.A or Key.R or Key.H or Key.T)
+        else if (Keyboard.Modifiers == ModifierKeys.None && e.Key is Key.V or Key.P or Key.A or Key.R or Key.H or Key.T or Key.C or Key.X or Key.D or Key.N)
             SetTool(e.Key switch { Key.P => EditorTool.Pen, Key.A => EditorTool.Arrow, Key.R => EditorTool.Rectangle,
-                Key.H => EditorTool.Highlight, Key.T => EditorTool.Text, _ => EditorTool.Select });
+                Key.H => EditorTool.Highlight, Key.T => EditorTool.Text, Key.C => EditorTool.Redact,
+                Key.X => EditorTool.Pixelate, Key.D => EditorTool.Blur, Key.N => EditorTool.Step, _ => EditorTool.Select });
         else return;
         e.Handled = true;
     }

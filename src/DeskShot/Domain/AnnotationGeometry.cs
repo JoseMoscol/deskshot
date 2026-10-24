@@ -44,11 +44,17 @@ public static class AnnotationGeometry
     public static bool HitTest(Annotation annotation, Point point, double tolerance)
     {
         double radius = tolerance + annotation.Width / 2;
-        if (annotation.Tool is AnnotationTool.Text or AnnotationTool.Rectangle or AnnotationTool.Highlight)
+        if (annotation.Tool is AnnotationTool.Text or AnnotationTool.Rectangle or AnnotationTool.Highlight or AnnotationTool.Redact or AnnotationTool.Pixelate or AnnotationTool.Blur)
         {
             Rect bounds = Bounds(annotation);
             bounds.Inflate(tolerance, tolerance);
             return bounds.Contains(point);
+        }
+        if (annotation.Tool == AnnotationTool.Step)
+        {
+            Rect bounds = Bounds(annotation);
+            var center = new Point(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
+            return (point - center).Length <= Math.Min(bounds.Width, bounds.Height) / 2 + tolerance;
         }
         for (int i = 1; i < annotation.Points.Count; i++)
             if (DistanceToSegment(point, annotation.Points[i - 1], annotation.Points[i]) <= radius) return true;
@@ -92,7 +98,7 @@ public static class AnnotationGeometry
         double height = Math.Clamp(top ? anchor.Y - point.Y : point.Y - anchor.Y, Math.Min(4, availableHeight), availableHeight);
         double sx = width / source.Width, sy = height / source.Height;
         double fontSize = annotation.FontSize;
-        if (annotation.Tool == AnnotationTool.Text)
+        if (annotation.Tool is AnnotationTool.Text or AnnotationTool.Step)
         {
             // El texto mantiene sus proporciones y escala la tipografía, sin deformarla.
             double minimum = 4 / annotation.FontSize;

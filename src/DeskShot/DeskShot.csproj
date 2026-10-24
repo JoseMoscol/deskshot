@@ -10,7 +10,7 @@
     <ApplicationIcon>Assets/deskshot.ico</ApplicationIcon>
     <AssemblyName>DeskShot</AssemblyName>
     <RootNamespace>DeskShot</RootNamespace>
-    <Version>0.5.1</Version>
+    <Version>0.6.0</Version>
     <Description>Captura y anota tu pantalla a resolución nativa.</Description>
     <!-- La ventana principal es WPF: PerMonitorV2 se declara en el manifiesto.
          WinForms solo aporta NotifyIcon, no Application.Run ni DPI de ventanas. -->

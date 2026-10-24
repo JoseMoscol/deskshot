@@ -190,6 +190,11 @@ public partial class App : System.Windows.Application
         }
     }
 
+    public PinnedCaptureWindow PinImage(BitmapSource image)
+    {
+        var window = new PinnedCaptureWindow(this, image) { ShowInTaskbar = _verificationMode }; window.Show(); window.Activate(); return window;
+    }
+
     public static async Task CopyTextAsync(string text)
     {
         if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("No hay texto para copiar.");

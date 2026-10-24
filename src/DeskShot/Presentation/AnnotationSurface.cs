@@ -4,7 +4,7 @@ using DeskShot.Infrastructure;
 
 namespace DeskShot.Presentation;
 
-public enum EditorTool { Select, Pen, Arrow, Rectangle, Highlight, Text }
+public enum EditorTool { Select, Pen, Arrow, Rectangle, Highlight, Text, Redact, Pixelate, Blur, Step }
 public sealed class AnnotationTextRequestedEventArgs(Point position, Annotation? existing = null) : EventArgs
 {
     public Point Position { get; } = position;
@@ -18,6 +18,8 @@ public sealed class AnnotationSurface : FrameworkElement
     private AnnotationTool _strokeTool;
     private Color _strokeColor;
     private double _strokeWidth;
+    private int _strokeEffectSize;
+    private Guid _strokeId;
     private EditorTool _tool;
     public AnnotationEditor Editor { get; }
     public event EventHandler? ToolChanged;
@@ -37,6 +39,7 @@ public sealed class AnnotationSurface : FrameworkElement
     }
     public Color InkColor { get; set; } = Color.FromRgb(255, 107, 107);
     public double InkWidth { get; set; } = 4;
+    public int EffectSize { get; set; } = 12;
     public Rect? InteractionBounds { get; set; }
     public bool HasPendingGesture => _points is not null || Editor.IsDragging;
     private double ImageScale => ActualWidth > 0 ? ActualWidth / _document.Width : 1;
@@ -74,9 +77,10 @@ public sealed class AnnotationSurface : FrameworkElement
         if (ActualWidth <= 0 || ActualHeight <= 0) return;
         dc.PushTransform(new ScaleTransform(ActualWidth / _document.Width, ActualHeight / _document.Height));
         dc.DrawImage(_document.Original, new Rect(0, 0, _document.Width, _document.Height));
-        foreach (var annotation in _document.Annotations)
-            AnnotationRenderer.Draw(dc, Editor.Preview?.Id == annotation.Id ? Editor.Preview : annotation);
-        if (_points?.Count >= 2) AnnotationRenderer.Draw(dc, new Annotation(_strokeTool, _strokeColor, _strokeWidth, _points));
+        var annotations = _document.Annotations.Select(a => Editor.Preview?.Id == a.Id ? Editor.Preview : a).ToList();
+        if (_points?.Count >= 2) annotations.Add(new Annotation(_strokeTool, _strokeColor, _strokeWidth, _points) { Id = _strokeId, EffectSize = _strokeEffectSize });
+        foreach (var annotation in annotations.OrderBy(a => a.Tool == AnnotationTool.Redact ? 2 : RedactionProcessor.IsRedaction(a.Tool) ? 1 : 0))
+            AnnotationRenderer.Draw(dc, annotation, _document.Original, _document.EffectSource, _document.EffectOffset);
         if (Tool == EditorTool.Select && (Editor.Preview ?? Editor.Selected) is { } selected) DrawSelection(dc, selected);
         dc.Pop();
     }
@@ -109,7 +113,8 @@ public sealed class AnnotationSurface : FrameworkElement
         base.OnMouseLeftButtonDown(e);
         Focus();
         Point point = ImagePoint(e);
-        if (Tool == EditorTool.Text)
+        if (Tool == EditorTool.Step) AddStep(point);
+        else if (Tool == EditorTool.Text)
         {
             TextRequested?.Invoke(this, new AnnotationTextRequestedEventArgs(point));
         }
@@ -126,8 +131,10 @@ public sealed class AnnotationSurface : FrameworkElement
         {
             Editor.Select(null);
             _strokeTool = Tool switch { EditorTool.Arrow => AnnotationTool.Arrow, EditorTool.Rectangle => AnnotationTool.Rectangle,
-                EditorTool.Highlight => AnnotationTool.Highlight, _ => AnnotationTool.Pen };
-            _strokeColor = InkColor; _strokeWidth = InkWidth;
+                EditorTool.Highlight => AnnotationTool.Highlight, EditorTool.Redact => AnnotationTool.Redact,
+                EditorTool.Pixelate => AnnotationTool.Pixelate, EditorTool.Blur => AnnotationTool.Blur, _ => AnnotationTool.Pen };
+            _strokeColor = Tool == EditorTool.Redact ? Colors.Black : InkColor; _strokeWidth = InkWidth;
+            _strokeEffectSize = EffectSize; _strokeId = Guid.NewGuid();
             _points = [point];
             CaptureMouse();
         }
@@ -191,11 +198,23 @@ public sealed class AnnotationSurface : FrameworkElement
             points[1] = new Point(end.X + 0.01, end.Y);
         _points = null;
         ReleaseMouseCapture();
-        var annotation = new Annotation(_strokeTool, _strokeColor, _strokeWidth, points);
+        var annotation = new Annotation(_strokeTool, _strokeColor, _strokeWidth, points) { Id = _strokeId, EffectSize = _strokeEffectSize };
         _document.Add(annotation);
         Tool = EditorTool.Select;
         Editor.Select(annotation.Id);
         InvalidateVisual();
         e.Handled = true;
+    }
+
+    public Annotation? AddStep(Point point)
+    {
+        if (_document.NextStepNumber > 9999) return null;
+        Rect area = InteractionBounds ?? new Rect(0, 0, _document.Width, _document.Height);
+        double diameter = Math.Min(48, Math.Min(area.Width, area.Height));
+        if (diameter < 4) return null;
+        double x = Math.Clamp(point.X - diameter / 2, area.Left, area.Right - diameter);
+        double y = Math.Clamp(point.Y - diameter / 2, area.Top, area.Bottom - diameter);
+        var annotation = new Annotation(AnnotationTool.Step, InkColor, 2, [new Point(x, y), new Point(x + diameter, y + diameter)]) { StepNumber = _document.NextStepNumber };
+        _document.Add(annotation); Editor.Select(annotation.Id); return annotation;
     }
 }
