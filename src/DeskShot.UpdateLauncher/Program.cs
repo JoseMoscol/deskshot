@@ -118,7 +118,7 @@ namespace DeskShot.UpdateLauncher
                 }
                 var info = FileVersionInfo.GetVersionInfo(plan.InstallerPath);
                 var version = new Version(plan.Version);
-                if (info.ProductName != "DeskShot" || info.FileMajorPart != version.Major || info.FileMinorPart != version.Minor || info.FileBuildPart != version.Build)
+                if ((info.ProductName ?? "").Trim() != "DeskShot" || info.FileMajorPart != version.Major || info.FileMinorPart != version.Minor || info.FileBuildPart != version.Build)
                     throw new InvalidDataException("El ejecutable no corresponde a la versión esperada de DeskShot.");
                 return file;
             }
@@ -154,7 +154,7 @@ namespace DeskShot.UpdateLauncher
         {
             if (String.IsNullOrEmpty(path) || !File.Exists(path)) return false;
             var info = FileVersionInfo.GetVersionInfo(path);
-            return info.ProductName == "DeskShot" && new Version(info.FileMajorPart, info.FileMinorPart, info.FileBuildPart) >= new Version(expected);
+            return (info.ProductName ?? "").Trim() == "DeskShot" && new Version(info.FileMajorPart, info.FileMinorPart, info.FileBuildPart) >= new Version(expected);
         }
         private static void Restart(string path)
         {

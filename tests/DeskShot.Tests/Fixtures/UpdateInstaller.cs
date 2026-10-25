@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
-[assembly: AssemblyProduct("DeskShot")]
+[assembly: AssemblyProduct("DeskShot                                                    ")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 internal static class UpdateInstaller
 {

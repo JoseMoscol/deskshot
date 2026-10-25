@@ -15,6 +15,8 @@
 AppId=DeskShot
 AppName=DeskShot
 AppVersion={#AppVersion}
+VersionInfoVersion={#AppVersion}
+VersionInfoProductVersion={#AppVersion}
 AppPublisher=Jose Moscol
 AppPublisherURL=https://github.com/JoseMoscol/deskshot
 AppSupportURL=https://github.com/JoseMoscol/deskshot/issues

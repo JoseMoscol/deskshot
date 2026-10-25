@@ -10,12 +10,12 @@ $testId = [Guid]::NewGuid().ToString('N')
 $verificationRoot = Join-Path $PSScriptRoot "artifacts/installer-verification/$testId"
 $installationPath = Join-Path $verificationRoot 'Installed'
 New-Item -ItemType Directory -Path $verificationRoot -Force | Out-Null
-$groupName = 'DeskShot'
+$groupName = 'DeskShot verification ' + $testId
 $shortcutFolder = Join-Path ([Environment]::GetFolderPath('Programs')) $groupName
-if (Test-Path -LiteralPath $shortcutFolder) { throw 'Ya existe el grupo de Inicio DeskShot. No se utiliza para hacer la prueba.' }
+if (Test-Path -LiteralPath $shortcutFolder) { throw 'Ya existe el grupo de Inicio de prueba. No se utiliza.' }
 $settingsPath = Join-Path $env:LOCALAPPDATA 'DeskShot/settings.json'
 $settingsHash = if (Test-Path -LiteralPath $settingsPath) { (Get-FileHash -LiteralPath $settingsPath).Hash } else { $null }
-$arguments = @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', '/TASKS=', ('/DIR="' + $installationPath + '"'))
+$arguments = @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', '/TASKS=', ('/GROUP="' + $groupName + '"'), ('/DIR="' + $installationPath + '"'))
 function Invoke-TestSetup([string]$LogName) {
     $runArguments = $arguments + ('/LOG="' + (Join-Path $verificationRoot $LogName) + '"')
     $run = Start-Process -FilePath $installerPath -ArgumentList $runArguments -WindowStyle Hidden -Wait -PassThru
@@ -24,7 +24,7 @@ function Invoke-TestSetup([string]$LogName) {
 try {
 if ((Invoke-TestSetup 'install.log') -ne 0) { throw 'Fallo la instalacion de prueba.' }
 $installedExe = Join-Path $installationPath 'DeskShot.exe'
-foreach ($file in @('DeskShot.exe', 'coreclr.dll', 'tessdata/spa.traineddata', 'tessdata/eng.traineddata', 'MANUAL.txt', 'unins000.exe')) {
+foreach ($file in @('DeskShot.exe', 'DeskShot.UpdateLauncher.exe', 'coreclr.dll', 'tessdata/spa.traineddata', 'tessdata/eng.traineddata', 'MANUAL.txt', 'unins000.exe')) {
     if (-not (Test-Path -LiteralPath (Join-Path $installationPath $file))) { throw "Falta un archivo instalado: $file" }
 }
 $registration = Get-ItemProperty -LiteralPath $registryPath

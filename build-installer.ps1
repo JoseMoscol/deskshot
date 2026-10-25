@@ -41,6 +41,11 @@ $runtimeNotice = "Microsoft Visual C++ x64 Redistributable`r`nOrigen: https://ak
 [IO.File]::WriteAllText((Join-Path $sourceFolder 'ThirdParty/VisualCpp-Redistributable.txt'), $runtimeNotice, [Text.UTF8Encoding]::new($false))
 & $Compiler '/Q' "/DAppVersion=$installerVersion" "/DSourceDir=$sourceFolder" "/DOutputDir=$releaseFolder" "/DVCRedist=$VCRedist" (Join-Path $PSScriptRoot 'packaging/DeskShot.iss')
 if ($LASTEXITCODE -ne 0) { throw 'Fallo la compilacion del instalador.' }
+$setupInfo = (Get-Item -LiteralPath $setupPath).VersionInfo
+$setupVersion = [Version]::new($setupInfo.FileMajorPart, $setupInfo.FileMinorPart, $setupInfo.FileBuildPart)
+if ($setupInfo.ProductName.Trim() -ne 'DeskShot' -or $setupVersion -ne [Version]$installerVersion) {
+    throw 'Los metadatos del instalador no corresponden a DeskShot y su version. El actualizador lo rechazaria.'
+}
 $setupHash = (Get-FileHash -LiteralPath $setupPath -Algorithm SHA256).Hash.ToLowerInvariant()
 [IO.File]::WriteAllText($setupPath + '.sha256', "$setupHash  $([IO.Path]::GetFileName($setupPath))`r`n", [Text.Encoding]::ASCII)
 Write-Host "Instalador listo: $setupPath"
