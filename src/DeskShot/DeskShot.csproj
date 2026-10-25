@@ -10,15 +10,21 @@
     <ApplicationIcon>Assets/deskshot.ico</ApplicationIcon>
     <AssemblyName>DeskShot</AssemblyName>
     <RootNamespace>DeskShot</RootNamespace>
-    <Version>0.6.0</Version>
+    <Version>0.7.0</Version>
     <Description>Captura y anota tu pantalla a resolución nativa.</Description>
     <!-- La ventana principal es WPF: PerMonitorV2 se declara en el manifiesto.
          WinForms solo aporta NotifyIcon, no Application.Run ni DPI de ventanas. -->
     <NoWarn>$(NoWarn);WFO0003</NoWarn>
+    <UpdateLauncherOutput>$(MSBuildProjectDirectory)\obj\UpdateLauncher\DeskShot.UpdateLauncher.exe</UpdateLauncherOutput>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Tesseract" Version="5.2.0" />
     <Content Include="tessdata/*.traineddata" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="ThirdParty/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="$(UpdateLauncherOutput)" Link="DeskShot.UpdateLauncher.exe" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
+  <Target Name="BuildUpdateLauncher" BeforeTargets="PrepareForBuild" Inputs="$(MSBuildProjectDirectory)\..\DeskShot.UpdateLauncher\Program.cs" Outputs="$(UpdateLauncherOutput)">
+    <MakeDir Directories="$(MSBuildProjectDirectory)\obj\UpdateLauncher" />
+    <Exec Command="&quot;$(WINDIR)\Microsoft.NET\Framework64\v4.0.30319\csc.exe&quot; /nologo /target:winexe /platform:x64 /optimize+ /reference:System.Runtime.Serialization.dll /reference:System.Windows.Forms.dll /out:&quot;$(UpdateLauncherOutput)&quot; &quot;$(MSBuildProjectDirectory)\..\DeskShot.UpdateLauncher\Program.cs&quot;" />
+  </Target>
 </Project>

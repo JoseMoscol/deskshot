@@ -8,4 +8,8 @@
   <ImplicitUsings>enable</ImplicitUsings>
  </PropertyGroup>
  <ItemGroup><ProjectReference Include="../../src/DeskShot/DeskShot.csproj" /></ItemGroup>
+ <ItemGroup>
+  <Compile Remove="Fixtures/*.cs" />
+  <None Include="Fixtures/*.cs" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+ </ItemGroup>
 </Project>

@@ -17,6 +17,6 @@ if (-not $SkipTests) {
     if ($LASTEXITCODE -ne 0) { throw 'Falló la verificación. No se publicó el ejecutable.' }
 }
 
-dotnet publish src/DeskShot/DeskShot.csproj -c Release --no-restore --self-contained false -o artifacts/DeskShot-0.6.0 --nologo -m:1 -nr:false
+dotnet publish src/DeskShot/DeskShot.csproj -c Release --no-restore --self-contained false -o artifacts/DeskShot-0.7.0 --nologo -m:1 -nr:false
 if ($LASTEXITCODE -ne 0) { throw 'No se pudo publicar DeskShot.' }
-Write-Host "Listo: $PSScriptRoot\artifacts\DeskShot-0.6.0\DeskShot.exe"
+Write-Host "Listo: $PSScriptRoot\artifacts\DeskShot-0.7.0\DeskShot.exe"

@@ -38,7 +38,7 @@ foreach ($framework in $runtimeConfiguration.runtimeOptions.includedFrameworks) 
         Copy-Item -LiteralPath (Join-Path $packageFolder 'LICENSE') -Destination (Join-Path $applicationFolder 'ThirdParty/WindowsDesktop-Runtime-LICENSE.txt')
     }
 }
-foreach ($requiredFile in @('DeskShot.exe', 'DeskShot.dll', 'coreclr.dll', 'hostfxr.dll', 'PresentationFramework.dll', 'Tesseract.dll', 'tessdata/spa.traineddata', 'tessdata/eng.traineddata', 'x64/tesseract50.dll', 'x64/leptonica-1.82.0.dll', 'ThirdParty/NOTICE.txt', 'ThirdParty/DotNet-Runtime-LICENSE.txt', 'ThirdParty/DotNet-Runtime-NOTICES.txt', 'ThirdParty/WindowsDesktop-Runtime-LICENSE.txt')) {
+foreach ($requiredFile in @('DeskShot.exe', 'DeskShot.dll', 'DeskShot.UpdateLauncher.exe', 'coreclr.dll', 'hostfxr.dll', 'PresentationFramework.dll', 'Tesseract.dll', 'tessdata/spa.traineddata', 'tessdata/eng.traineddata', 'x64/tesseract50.dll', 'x64/leptonica-1.82.0.dll', 'ThirdParty/NOTICE.txt', 'ThirdParty/DotNet-Runtime-LICENSE.txt', 'ThirdParty/DotNet-Runtime-NOTICES.txt', 'ThirdParty/WindowsDesktop-Runtime-LICENSE.txt')) {
     if (-not (Test-Path -LiteralPath (Join-Path $applicationFolder $requiredFile))) { throw "El paquete esta incompleto: falta $requiredFile." }
 }
 

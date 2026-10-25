@@ -25,6 +25,9 @@ internal static partial class Program
         app.InitializeComponent();
         if (args.Contains("--floating-demo")) return ShowFloatingDemo(app);
         if (args.Contains("--features-demo")) return ShowFeaturesDemo(app);
+        if (args.Contains("--updates-demo")) return ShowUpdatesDemo(app);
+        if (args.Contains("--update-network")) { Run("Actualizaciones: descarga real de GitHub sin instalar", TestUpdateNetwork); return _failed == 0 ? 0 : 1; }
+        if (args.Contains("--update-handoff")) { Run("Actualizaciones: espera, instalación y reinicio con ejecutables sintéticos", TestUpdateHandoff); return _failed == 0 ? 0 : 1; }
         if (args.Contains("--scroll-document")) return ShowScrollDocument(app);
         if (args.Contains("--scroll-demo")) return ShowScrollDemo(app);
         if (args.Contains("--verify-scroll-demo")) { Run("Documento real: 24 secciones capturadas y OCR local", TestRealScrollResult); return _failed == 0 ? 0 : 1; }
@@ -70,6 +73,12 @@ internal static partial class Program
         Run("OCR local respeta censura y omite otras anotaciones", TestRedactedOcr);
         Run("Anclado: copia independiente, zoom y opacidad", () => TestPinnedCapture(app));
         Run("Interfaz: censura, pasos y propiedades compartidas", () => TestFeatureControls(app));
+        Run("Actualizaciones: versiones estables y origen del instalador", TestUpdateMetadata);
+        Run("Actualizaciones: descarga, SHA-256 y caché verificada", TestUpdateDownload);
+        Run("Actualizaciones: datos corruptos, truncados y rutas ajenas", TestUpdateFailures);
+        Run("Actualizaciones: redirecciones HTTPS permitidas y bloqueadas", TestUpdateRedirects);
+        Run("Actualizaciones: cancelación limpia archivos incompletos", TestUpdateCancellation);
+        Run("Actualizaciones: controles de búsqueda, descarga y errores", () => TestUpdateWindow(app));
         if (args.Contains("--desktop")) Run("Captura real del escritorio a dimensiones nativas", TestDesktopCapture);
         Console.WriteLine($"\n{_passed} pruebas correctas; {_failed} fallidas. Evidencias: {_output}");
         return _failed == 0 ? 0 : 1;
@@ -205,7 +214,7 @@ internal static partial class Program
         var settings = new AppSettings
         {
             SaveFolder = _output, Format = ImageFileFormat.Jpeg, JpegQuality = 88, CaptureDelaySeconds = 3,
-            AutoSave = true, CopyAfterCapture = false, Shortcut = new(ModifierKeys.Control | ModifierKeys.Alt, Key.F8)
+            AutoSave = true, CopyAfterCapture = false, CheckUpdatesOnStartup = true, Shortcut = new(ModifierKeys.Control | ModifierKeys.Alt, Key.F8)
         };
         store.Save(settings);
         Check(store.Load() == settings, "La configuración no persiste correctamente.");

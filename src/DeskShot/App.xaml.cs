@@ -23,11 +23,16 @@ public partial class App : System.Windows.Application
     private Mutex? _installerGuard;
     private bool _ownsMutex;
     private bool _capturing;
+    private bool _preparingUpdate;
+    private UpdatesWindow? _updatesWindow;
+    private readonly CancellationTokenSource _lifetime = new();
     private bool _trayHintShown;
     public bool IsExiting { get; private set; }
     public AppSettings Settings { get; private set; } = new();
     public IImageExporter Exporter { get; } = new ImageExporter();
     public IOcrEngine OcrEngine { get; } = new TesseractOcrEngine();
+    public IUpdateService Updates { get; } = new GitHubUpdateService();
+    public static Version CurrentVersion => GitHubUpdateService.Normalize(typeof(App).Assembly.GetName().Version ?? new Version(0, 0, 0));
     public MainWindow Dashboard { get; private set; } = null!;
 
     protected override void OnStartup(StartupEventArgs e)
@@ -58,6 +63,7 @@ public partial class App : System.Windows.Application
         Dashboard.Show();
         CreateTray();
         if (_settingsStore.LoadWarning is not null) Dashboard.SetStatus(_settingsStore.LoadWarning);
+        if (Settings.CheckUpdatesOnStartup) _ = CheckUpdatesOnStartupAsync();
     }
 
     private void CreateTray()
@@ -70,6 +76,7 @@ public partial class App : System.Windows.Application
         menu.Items.Add("Capturar con desplazamiento", null, (_, _) => Dispatcher.BeginInvoke(async () => await CaptureAsync(true, scrolling: true)));
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("Abrir DeskShot", null, (_, _) => Dispatcher.BeginInvoke(() => Dashboard.ShowHome()));
+        menu.Items.Add("Buscar actualizaciones", null, (_, _) => Dispatcher.BeginInvoke(ShowUpdates));
         menu.Items.Add("Salir", null, (_, _) => Dispatcher.BeginInvoke(ExitApplication));
         _tray.ContextMenuStrip = menu;
         _tray.DoubleClick += (_, _) => Dispatcher.BeginInvoke(() => Dashboard.ShowHome());
@@ -99,7 +106,7 @@ public partial class App : System.Windows.Application
 
     public async Task CaptureAsync(bool region, bool scrolling = false)
     {
-        if (_capturing || IsExiting) return;
+        if (_capturing || _preparingUpdate || IsExiting) return;
         _capturing = true;
         Dashboard.SetBusy(true);
         var visible = Windows.Cast<Window>().Where(w => w.IsVisible).Select(w => (Window: w, State: w.WindowState)).ToList();
@@ -207,7 +214,7 @@ public partial class App : System.Windows.Application
 
     public void ExitApplication()
     {
-        if (IsExiting || _capturing) return;
+        if (IsExiting || _capturing || _preparingUpdate) return;
         // Cada editor resuelve sus cambios pendientes antes de terminar la aplicación.
         foreach (var editor in Windows.OfType<EditorWindow>().ToArray())
         {
@@ -218,14 +225,58 @@ public partial class App : System.Windows.Application
         Shutdown();
     }
 
+    public void ShowUpdates()
+    {
+        if (_capturing || _preparingUpdate || IsExiting) return;
+        Dashboard.ShowHome();
+        if (_updatesWindow is not null) { _updatesWindow.Show(); _updatesWindow.Activate(); return; }
+        var window = new UpdatesWindow(this) { Owner = Dashboard };
+        _updatesWindow = window; window.Closed += (_, _) => _updatesWindow = null;
+        window.Show(); window.Activate();
+    }
+    private async Task CheckUpdatesOnStartupAsync()
+    {
+        try
+        {
+            var update = await Updates.CheckAsync(CurrentVersion, _lifetime.Token);
+            if (update is null || IsExiting) return;
+            Dashboard.SetStatus($"DeskShot {update.Version.ToString(3)} está disponible. Abre Actualizaciones para descargarla.");
+            _tray?.ShowBalloonTip(4000, "Nueva versión de DeskShot", $"Versión {update.Version.ToString(3)} disponible. Abre Actualizaciones desde el menú de la bandeja.", Forms.ToolTipIcon.Info);
+        }
+        catch (OperationCanceledException) { }
+        catch { /* Una consulta opcional sin conexión no interrumpe las capturas. */ }
+    }
+    public async Task<bool> InstallUpdateAsync(VerifiedUpdate update, IUpdateService service)
+    {
+        if (_capturing || _preparingUpdate || IsExiting) return false;
+        _preparingUpdate = true; Dashboard?.SetBusy(true);
+        try
+        {
+            await service.ValidateAsync(update, _lifetime.Token);
+            if (Windows.OfType<PinnedCaptureWindow>().Any() && MessageBox.Show(_updatesWindow,
+                "Las capturas ancladas se cerrarán al actualizar. Copia o guarda las que quieras conservar antes de continuar. ¿Instalar ahora?", "Actualizar DeskShot", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return false;
+            foreach (var editor in Windows.OfType<EditorWindow>().ToArray())
+            {
+                editor.Close(); if (Windows.Cast<Window>().Contains(editor)) return false;
+            }
+            string appPath = Environment.ProcessPath ?? throw new IOException("No se encuentra la ubicación de DeskShot.");
+            if (!string.Equals(Path.GetFileName(appPath), "DeskShot.exe", StringComparison.OrdinalIgnoreCase)) throw new IOException("Instala la actualización desde DeskShot.exe.");
+            using var handoff = await UpdateHandoff.PrepareAsync(update, appPath, _lifetime.Token);
+            handoff.Commit(); IsExiting = true; Shutdown(); return true;
+        }
+        finally { _preparingUpdate = false; if (!IsExiting) Dashboard?.SetBusy(false); }
+    }
+
     protected override void OnExit(ExitEventArgs e)
     {
+        _lifetime.Cancel();
         _hotkey?.Dispose();
         if (_tray is not null) { _tray.Visible = false; _tray.ContextMenuStrip?.Dispose(); _tray.Dispose(); }
         _trayIcon?.Dispose();
         if (_ownsMutex) _mutex?.ReleaseMutex();
         _mutex?.Dispose();
         _installerGuard?.Dispose();
+        (Updates as IDisposable)?.Dispose(); _lifetime.Dispose();
         base.OnExit(e);
     }
 }

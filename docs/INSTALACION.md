@@ -2,14 +2,14 @@
 
 ## Descarga para Windows x64
 
-Abre [la última versión publicada](https://github.com/JoseMoscol/deskshot/releases/latest). En **Assets**, elige **DeskShot-0.6.0-win-x64-Setup.exe** para instalar, o **DeskShot-0.6.0-win-x64.zip** para usarlo en modo portable. Los archivos automáticos **Source code** contienen el proyecto para desarrolladores, no la aplicación preparada para ejecutar.
+Abre [la última versión publicada](https://github.com/JoseMoscol/deskshot/releases/latest). En **Assets**, elige **DeskShot-0.7.0-win-x64-Setup.exe** para instalar, o **DeskShot-0.7.0-win-x64.zip** para usarlo en modo portable. Los archivos automáticos **Source code** contienen el proyecto para desarrolladores, no la aplicación preparada para ejecutar.
 
 Ambas ediciones incluyen el runtime de .NET y los modelos OCR de español e inglés. No necesitas Visual Studio, el SDK ni instalar .NET por separado.
 
 ## Instalar con Setup.exe
 
 1. Cierra cualquier versión abierta desde el icono de DeskShot en la bandeja.
-2. Abre **DeskShot-0.6.0-win-x64-Setup.exe** y sigue el asistente en español.
+2. Abre **DeskShot-0.7.0-win-x64-Setup.exe** y sigue el asistente en español.
 3. Elige la carpeta de destino. Por defecto se instala para tu usuario en `%LOCALAPPDATA%\Programs\DeskShot`.
 4. El acceso de Inicio se crea automáticamente. Puedes elegir también un acceso en el escritorio.
 5. Al terminar puedes abrir DeskShot desde el asistente o desde Inicio.
@@ -48,11 +48,20 @@ Por defecto, cerrar la ventana principal deja DeskShot en la bandeja del sistema
 
 ## Actualizar
 
-1. Sal de DeskShot desde la bandeja.
-2. Si lo instalaste con Setup, ejecuta el instalador de la nueva versión: conservará la carpeta elegida y los accesos. No necesitas desinstalar antes.
-3. Si usas el ZIP portable, extrae la nueva versión en otra carpeta, abre su `DeskShot.exe` y actualiza tu acceso directo si corresponde.
+**Desde 0.6.0 o anterior:** cierra DeskShot desde la bandeja y ejecuta una vez el instalador de la 0.7.0. No necesitas desinstalar antes. Esa actualización incorpora el nuevo menú.
 
-La configuración se conserva en `%LOCALAPPDATA%\DeskShot\settings.json`. Las capturas guardadas permanecen en la carpeta que elegiste. No hay un actualizador automático.
+**Desde la 0.7.0:**
+
+1. Abre **Actualizaciones** en la ventana principal o **Buscar actualizaciones** desde la bandeja.
+2. Consulta la versión disponible y sus novedades. Pulsa **Descargar actualización**; puedes cancelar y volver a intentarlo. Se comprueban el tamaño y la huella SHA-256 antes de permitir la instalación.
+3. Guarda o copia las referencias ancladas que quieras conservar. Pulsa **Instalar y abrir DeskShot** y resuelve los cambios pendientes de los editores.
+4. La app se cierra y abre el asistente. Sigue sus pasos; al terminar se vuelve a abrir DeskShot. Si cancelas el asistente, se intenta volver a abrir la versión anterior.
+
+En **Configuración → Buscar actualizaciones al iniciar** puedes activar los avisos de nuevas versiones; está desactivado por defecto. No descarga ni instala automáticamente. La búsqueda y descarga necesitan internet y solo consultan GitHub; las capturas y el OCR siguen funcionando localmente y nunca se envían.
+
+La configuración se conserva en `%LOCALAPPDATA%\DeskShot\settings.json`. Las capturas guardadas permanecen en la carpeta que elegiste. Los instaladores descargados quedan en `%LOCALAPPDATA%\DeskShot\Updates` y se verifican de nuevo antes de ejecutarse. La comprobación SHA-256 no sustituye una firma de código.
+
+**Edición portable:** el botón **Instalar edición normal** instala la edición con asistente y acceso en Inicio. Para seguir usando el ZIP, extrae manualmente la nueva versión en otra carpeta y actualiza tu acceso directo. Si no hay conexión o falla GitHub, también puedes instalar manualmente desde Releases.
 
 ## Quitar la aplicación
 
@@ -65,7 +74,7 @@ Si usas el ZIP portable, sal de DeskShot y elimina la carpeta que extrajiste y s
 Cada descarga incluye su archivo `.sha256`. Puedes comprobar el instalador desde PowerShell (para el ZIP usa su nombre):
 
 ```powershell
-Get-FileHash .\DeskShot-0.6.0-win-x64-Setup.exe -Algorithm SHA256
+Get-FileHash .\DeskShot-0.7.0-win-x64-Setup.exe -Algorithm SHA256
 ```
 
 El resultado debe coincidir con el valor del archivo publicado. Los archivos de aplicación y los modelos del OCR se incluyen dentro del ZIP; no debes descargar DLLs sueltas de otros sitios.

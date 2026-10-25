@@ -57,11 +57,16 @@ Name: "{group}\Manual de DeskShot"; Filename: "{app}\MANUAL.txt"
 Name: "{autodesktop}\DeskShot"; Filename: "{app}\DeskShot.exe"; WorkingDir: "{app}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\DeskShot.exe"; Description: "Abrir DeskShot"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\DeskShot.exe"; Description: "Abrir DeskShot"; Flags: nowait postinstall skipifsilent; Check: ShouldLaunchDeskShot
 
 [Code]
 var
   RuntimeNeedsRestart: Boolean;
+
+function ShouldLaunchDeskShot: Boolean;
+begin
+  Result := ExpandConstant('{param:DESKSHOTUPDATE|0}') <> '1';
+end;
 
 function HasVCRuntime: Boolean;
 var

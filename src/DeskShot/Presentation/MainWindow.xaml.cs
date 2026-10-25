@@ -18,7 +18,7 @@ public partial class MainWindow : Window
     }
 
     public void SetStatus(string message) => StatusText.Text = message;
-    public void SetBusy(bool busy) { RegionButton.IsEnabled = DesktopButton.IsEnabled = ScrollButton.IsEnabled = !busy; }
+    public void SetBusy(bool busy) { RegionButton.IsEnabled = DesktopButton.IsEnabled = ScrollButton.IsEnabled = UpdatesButton.IsEnabled = !busy; }
     public bool IsEditingShortcut => IsVisible && ShortcutBox.IsKeyboardFocusWithin;
 
     public void ShowHome()
@@ -42,6 +42,7 @@ public partial class MainWindow : Window
     private async void CaptureDesktop_Click(object sender, RoutedEventArgs e) => await _app.CaptureAsync(false);
     private async void CaptureScroll_Click(object sender, RoutedEventArgs e) => await _app.CaptureAsync(true, scrolling: true);
     private void Exit_Click(object sender, RoutedEventArgs e) => _app.ExitApplication();
+    private void Updates_Click(object sender, RoutedEventArgs e) => _app.ShowUpdates();
 
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
     {
@@ -95,6 +96,7 @@ public partial class MainWindow : Window
         CopyBox.IsChecked = settings.CopyAfterCapture;
         AutoSaveBox.IsChecked = settings.AutoSave;
         TrayBox.IsChecked = settings.MinimizeToTray;
+        UpdateCheckBox.IsChecked = settings.CheckUpdatesOnStartup;
         FormatSummary.Text = settings.Format == ImageFileFormat.Png ? "PNG · sin pérdida" : $"JPG · calidad {settings.JpegQuality}";
     }
 
@@ -110,7 +112,7 @@ public partial class MainWindow : Window
                 Format = FormatBox.SelectedIndex == 0 ? ImageFileFormat.Png : ImageFileFormat.Jpeg,
                 JpegQuality = quality, CaptureDelaySeconds = delay,
                 CopyAfterCapture = CopyBox.IsChecked == true, AutoSave = AutoSaveBox.IsChecked == true,
-                MinimizeToTray = TrayBox.IsChecked == true
+                MinimizeToTray = TrayBox.IsChecked == true, CheckUpdatesOnStartup = UpdateCheckBox.IsChecked == true
             }.Validate();
             // Comprobar escritura antes de registrar o persistir cambios.
             Directory.CreateDirectory(settings.SaveFolder);

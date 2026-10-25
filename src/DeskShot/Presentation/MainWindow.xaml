@@ -19,13 +19,14 @@
      <Button x:Name="HomeNav" Content="Inicio" HorizontalContentAlignment="Left" Click="Home_Click" Background="#26384A" Margin="0,0,0,10" />
      <Button x:Name="SettingsNav" Content="Configuración" HorizontalContentAlignment="Left" Click="Settings_Click" Background="Transparent" BorderThickness="0" />
      <Button Content="Abrir carpeta" HorizontalContentAlignment="Left" Click="OpenFolder_Click" Background="Transparent" BorderThickness="0" Margin="0,10,0,0" />
+     <Button x:Name="UpdatesButton" Content="Actualizaciones" HorizontalContentAlignment="Left" Click="Updates_Click" Background="Transparent" BorderThickness="0" Margin="0,10,0,0" />
     </StackPanel>
     <StackPanel Grid.Row="2">
      <Border BorderBrush="#314238" Background="#172D27" BorderThickness="1" CornerRadius="8" Padding="12">
-      <StackPanel><TextBlock Text="100 % local" Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold" /><TextBlock Text="Tus capturas, en tu equipo." Style="{StaticResource MutedText}" FontSize="11" Margin="0,4,0,0" /></StackPanel>
+      <StackPanel><TextBlock Text="Capturas locales" Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold" /><TextBlock Text="OCR sin conexión." Style="{StaticResource MutedText}" FontSize="11" Margin="0,4,0,0" /></StackPanel>
      </Border>
      <Button Content="Salir de DeskShot" Click="Exit_Click" Background="Transparent" BorderThickness="0" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,12,0,0" />
-     <TextBlock Text="DESKSHOT / 0.6.0" Foreground="#728297" FontSize="10" HorizontalAlignment="Center" Margin="0,14,0,0" />
+     <TextBlock Text="DESKSHOT / 0.7.0" Foreground="#728297" FontSize="10" HorizontalAlignment="Center" Margin="0,14,0,0" />
     </StackPanel>
    </Grid>
   </Border>
@@ -84,6 +85,8 @@
       <CheckBox x:Name="CopyBox" Content="Copiar al portapapeles después de capturar" />
       <CheckBox x:Name="AutoSaveBox" Content="Guardar automáticamente una copia al capturar" />
       <CheckBox x:Name="TrayBox" Content="Al cerrar, mantener DeskShot en la bandeja del sistema" />
+      <CheckBox x:Name="UpdateCheckBox" Content="Buscar actualizaciones al iniciar (requiere internet)" />
+      <TextBlock Text="Solo se consulta GitHub para comprobar versiones. El OCR y las capturas siguen siendo locales. Las actualizaciones no se descargan ni instalan sin tu acción." Style="{StaticResource MutedText}" FontSize="11" Margin="0,5,0,8" />
       <TextBlock Text="En modo flotante decides cuándo terminar: Copiar puede guardar una copia automática; Guardar puede copiar la imagen. Al abrir el editor completo se aplican ambos automatismos." Style="{StaticResource MutedText}" FontSize="11" Margin="0,8,0,0" />
       <Button Content="Guardar configuración" Style="{StaticResource AccentButton}" Click="SaveSettings_Click" HorizontalAlignment="Left" Margin="0,20,0,12" />
      </StackPanel>

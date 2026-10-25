@@ -31,6 +31,7 @@ public sealed record AppSettings
     public bool CopyAfterCapture { get; init; } = true;
     public bool MinimizeToTray { get; init; } = true;
     public int CaptureDelaySeconds { get; init; }
+    public bool CheckUpdatesOnStartup { get; init; }
 
     public AppSettings Validate()
     {

@@ -35,12 +35,19 @@ USO RAPIDO
 CIERRE Y ACTUALIZACION
 Cerrar la ventana normalmente mantiene DeskShot en la bandeja.
 Para salir por completo, usa Salir desde el icono de la bandeja.
-Sal de la version anterior antes de abrir una actualizacion.
+Actualizaciones permite buscar y descargar la nueva version desde GitHub,
+con progreso, cancelacion y verificacion SHA-256. No envia capturas ni OCR.
+En esta edicion, Instalar edicion normal abre el asistente y crea un
+acceso en Inicio. Para seguir portable, descarga y extrae el nuevo ZIP.
+En Configuracion puedes activar buscar al iniciar (desactivado por defecto).
+No se descarga ni instala sin tu accion. El OCR funciona sin internet.
+Guarda las referencias ancladas antes de instalar una actualizacion.
+Sal de la version anterior antes de abrir otra copia portable.
 La configuracion se conserva en %LOCALAPPDATA%\DeskShot\settings.json.
 Para quitar la aplicacion, cierrala y elimina la carpeta extraida.
 Tus capturas guardadas se mantienen en su carpeta de destino.
 
-La aplicacion aun no tiene firma de codigo ni actualizador automatico.
+La aplicacion aun no tiene firma de codigo. El SHA-256 no la sustituye.
 
 MANUAL COMPLETO Y DESCARGAS
 https://github.com/JoseMoscol/deskshot/blob/main/docs/INSTALACION.md
