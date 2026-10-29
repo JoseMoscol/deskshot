@@ -16,7 +16,7 @@ public partial class App : System.Windows.Application
     internal App(bool verificationMode) => _verificationMode = verificationMode;
     private readonly JsonSettingsStore _settingsStore = new();
     private readonly ICaptureService _captureService = new GdiCaptureService();
-    private GlobalHotkey? _hotkey;
+    private CaptureHotkeys? _hotkeys;
     private Forms.NotifyIcon? _tray;
     private System.Drawing.Icon? _trayIcon;
     private Mutex? _mutex;
@@ -25,6 +25,7 @@ public partial class App : System.Windows.Application
     private bool _capturing;
     private bool _preparingUpdate;
     private UpdatesWindow? _updatesWindow;
+    private PdfExportWindow? _pdfWindow;
     private readonly CancellationTokenSource _lifetime = new();
     private bool _trayHintShown;
     public bool IsExiting { get; private set; }
@@ -55,10 +56,16 @@ public partial class App : System.Windows.Application
         MainWindow = Dashboard;
         Dashboard.SourceInitialized += (_, _) =>
         {
-            _hotkey = new GlobalHotkey(new WindowInteropHelper(Dashboard).Handle);
-            _hotkey.Pressed += async (_, _) => { if (!Dashboard.IsEditingShortcut) await CaptureAsync(true); };
-            try { _hotkey.Register(Settings.Shortcut); }
-            catch (Exception ex) { Dashboard.SetStatus("Captura disponible con los botones. " + ex.Message); }
+            _hotkeys = new CaptureHotkeys(new WindowInteropHelper(Dashboard).Handle);
+            _hotkeys.CapturePressed += async (_, _) => { if (!Dashboard.IsEditingShortcut) await CaptureAsync(true); };
+            _hotkeys.OcrPressed += async (_, _) => { if (!Dashboard.IsEditingShortcut) await CaptureAsync(true, quickOcr: true); };
+            try { _hotkeys.Apply(Settings.Shortcut, Settings.OcrShortcut); }
+            catch (Exception ex)
+            {
+                try { _hotkeys.Apply(Settings.Shortcut, null); }
+                catch { try { _hotkeys.Apply(null, Settings.OcrShortcut); } catch { } }
+                Dashboard.SetStatus("Algún atajo está ocupado; los botones siguen disponibles. " + ex.Message);
+            }
         };
         Dashboard.Show();
         CreateTray();
@@ -74,6 +81,8 @@ public partial class App : System.Windows.Application
         menu.Items.Add("Capturar región", null, (_, _) => Dispatcher.BeginInvoke(async () => await CaptureAsync(true)));
         menu.Items.Add("Capturar escritorio", null, (_, _) => Dispatcher.BeginInvoke(async () => await CaptureAsync(false)));
         menu.Items.Add("Capturar con desplazamiento", null, (_, _) => Dispatcher.BeginInvoke(async () => await CaptureAsync(true, scrolling: true)));
+        menu.Items.Add("OCR rápido · seleccionar y copiar texto", null, (_, _) => Dispatcher.BeginInvoke(async () => await CaptureAsync(true, quickOcr: true)));
+        menu.Items.Add("Crear PDF con imágenes", null, (_, _) => Dispatcher.BeginInvoke(ShowPdf));
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("Abrir DeskShot", null, (_, _) => Dispatcher.BeginInvoke(() => Dashboard.ShowHome()));
         menu.Items.Add("Buscar actualizaciones", null, (_, _) => Dispatcher.BeginInvoke(ShowUpdates));
@@ -92,21 +101,14 @@ public partial class App : System.Windows.Application
     public void ApplySettings(AppSettings settings)
     {
         settings.Validate();
-        var previous = _hotkey?.Current;
-        _hotkey?.Register(settings.Shortcut);
-        try { _settingsStore.Save(settings); }
-        catch
-        {
-            if (previous is not null) _hotkey?.Register(previous);
-            else _hotkey?.Unregister();
-            throw;
-        }
+        if (_hotkeys is not null) _hotkeys.Apply(settings.Shortcut, settings.OcrShortcut, () => _settingsStore.Save(settings));
+        else _settingsStore.Save(settings);
         Settings = settings;
     }
 
-    public async Task CaptureAsync(bool region, bool scrolling = false)
+    public async Task CaptureAsync(bool region, bool scrolling = false, bool quickOcr = false)
     {
-        if (_capturing || _preparingUpdate || IsExiting) return;
+        if (_capturing || _preparingUpdate || IsExiting || _pdfWindow is not null) return;
         _capturing = true;
         Dashboard.SetBusy(true);
         var visible = Windows.Cast<Window>().Where(w => w.IsVisible).Select(w => (Window: w, State: w.WindowState)).ToList();
@@ -128,7 +130,7 @@ public partial class App : System.Windows.Application
             await Task.Delay(220 + Settings.CaptureDelaySeconds * 1000);
             NativeMethods.DwmFlush();
             var frame = await Task.Run(_captureService.CaptureDesktop);
-            var floating = new FloatingCaptureWindow(this, frame, selectWholeDesktop: !region, scrolling: scrolling);
+            var floating = new FloatingCaptureWindow(this, frame, selectWholeDesktop: !region, scrolling: scrolling, quickOcr: quickOcr);
             if (floating.ShowDialog() != true)
             {
                 Dashboard.SetStatus("Captura cancelada.");
@@ -137,6 +139,14 @@ public partial class App : System.Windows.Application
             if (floating.ResultAction == FloatingCaptureAction.Completed)
             {
                 Dashboard.SetStatus(floating.CompletionMessage);
+                return;
+            }
+            if (floating.ResultAction == FloatingCaptureAction.QuickOcr)
+            {
+                var textImage = ImageExporter.RenderForOcr(floating.Document);
+                Restore();
+                new OcrWindow(OcrEngine, textImage, autoCopy: true) { Owner = Dashboard }.ShowDialog();
+                Dashboard.SetStatus("OCR rápido terminado. La imagen no se guardó ni sustituyó el texto del portapapeles.");
                 return;
             }
             string? scrollMessage = null;
@@ -202,6 +212,21 @@ public partial class App : System.Windows.Application
         var window = new PinnedCaptureWindow(this, image) { ShowInTaskbar = _verificationMode }; window.Show(); window.Activate(); return window;
     }
 
+    public void ShowPdf()
+    {
+        if (_capturing || _preparingUpdate || IsExiting) return;
+        Dashboard.ShowHome();
+        OpenPdf(null, Dashboard);
+    }
+    public PdfExportWindow? OpenPdf(PdfCapture? initial, Window owner)
+    {
+        if (_capturing || _preparingUpdate || IsExiting) return null;
+        if (_pdfWindow is not null) { _pdfWindow.Activate(); return null; }
+        var window = new PdfExportWindow(Settings.SaveFolder, initial) { Owner = owner };
+        _pdfWindow = window; window.Closed += (_, _) => _pdfWindow = null;
+        window.ShowDialog(); return window;
+    }
+
     public static async Task CopyTextAsync(string text)
     {
         if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("No hay texto para copiar.");
@@ -215,6 +240,7 @@ public partial class App : System.Windows.Application
     public void ExitApplication()
     {
         if (IsExiting || _capturing || _preparingUpdate) return;
+        if (_pdfWindow is not null) { _pdfWindow.Close(); if (_pdfWindow is not null) return; }
         // Cada editor resuelve sus cambios pendientes antes de terminar la aplicación.
         foreach (var editor in Windows.OfType<EditorWindow>().ToArray())
         {
@@ -227,7 +253,7 @@ public partial class App : System.Windows.Application
 
     public void ShowUpdates()
     {
-        if (_capturing || _preparingUpdate || IsExiting) return;
+        if (_capturing || _preparingUpdate || IsExiting || _pdfWindow is not null) return;
         Dashboard.ShowHome();
         if (_updatesWindow is not null) { _updatesWindow.Show(); _updatesWindow.Activate(); return; }
         var window = new UpdatesWindow(this) { Owner = Dashboard };
@@ -253,6 +279,7 @@ public partial class App : System.Windows.Application
         try
         {
             await service.ValidateAsync(update, _lifetime.Token);
+            if (_pdfWindow is not null) { _pdfWindow.Close(); if (_pdfWindow is not null) return false; }
             if (Windows.OfType<PinnedCaptureWindow>().Any() && MessageBox.Show(_updatesWindow,
                 "Las capturas ancladas se cerrarán al actualizar. Copia o guarda las que quieras conservar antes de continuar. ¿Instalar ahora?", "Actualizar DeskShot", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return false;
             foreach (var editor in Windows.OfType<EditorWindow>().ToArray())
@@ -270,7 +297,7 @@ public partial class App : System.Windows.Application
     protected override void OnExit(ExitEventArgs e)
     {
         _lifetime.Cancel();
-        _hotkey?.Dispose();
+        _hotkeys?.Dispose();
         if (_tray is not null) { _tray.Visible = false; _tray.ContextMenuStrip?.Dispose(); _tray.Dispose(); }
         _trayIcon?.Dispose();
         if (_ownsMutex) _mutex?.ReleaseMutex();

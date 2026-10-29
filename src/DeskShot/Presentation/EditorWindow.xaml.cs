@@ -152,6 +152,19 @@ public partial class EditorWindow : Window
     private async void SaveAs_Click(object sender, RoutedEventArgs e) => await SaveAsync(true);
     private async void Copy_Click(object sender, RoutedEventArgs e) => await CopyAsync();
     private void ExtractText_Click(object sender, RoutedEventArgs e) => ShowOcr();
+    private void Pdf_Click(object sender, RoutedEventArgs e)
+    {
+        if (_outputBusy) return;
+        _surface.CancelGesture();
+        try
+        {
+            long revision = _document.Revision;
+            var image = _app.Exporter.Render(_document);
+            var window = _app.OpenPdf(new($"Captura {_document.CreatedAt:HH:mm:ss} · {image.PixelWidth} × {image.PixelHeight} px", image), this);
+            if (window?.OriginalExported == true) { _savedRevision = revision; UpdateHistory(); EditorStatus.Text = "Captura exportada al PDF: " + window.SavedPath; }
+        }
+        catch (Exception ex) { EditorStatus.Text = "No se pudo preparar el PDF: " + ex.Message; }
+    }
     private void Pin_Click(object sender, RoutedEventArgs e)
     {
         if (_outputBusy) return;

@@ -9,19 +9,39 @@ namespace DeskShot.Presentation;
 public partial class ScrollingCaptureWindow : Window
 {
     private readonly PixelBounds _bounds;
+    private PixelBounds _detectedBounds;
     private readonly CancellationTokenSource _stop = new();
     private bool _running;
+    private bool _detecting;
     private NativeMethods.NativeRect _controlsBounds;
     public ScrollingCaptureResult? Result { get; private set; }
     public ScrollingCaptureWindow(PixelBounds bounds)
     {
-        _bounds = bounds; InitializeComponent();
+        _bounds = _detectedBounds = bounds; InitializeComponent();
         ProgressText.Text = $"Área: {bounds.Width} × {bounds.Height} px · resolución nativa";
         Closed += (_, _) => _stop.Dispose();
     }
+    private async void Detect_Click(object sender, RoutedEventArgs e)
+    {
+        if (_running || _detecting) return;
+        _detecting = true;
+        DetectButton.IsEnabled = StartButton.IsEnabled = false;
+        try
+        {
+            NativeMethods.GetWindowRect(new WindowInteropHelper(this).Handle, out _controlsBounds);
+            SetControlsVisible(false); await Task.Delay(200);
+            var suggestion = await WindowsScrollAreaDetector.DetectAsync(_bounds, _stop.Token);
+            _detectedBounds = suggestion.Bounds;
+            AreaPreview.Source = await Task.Run(() => new GdiCaptureService().CaptureRegion(_detectedBounds));
+            AreaPreview.Visibility = Visibility.Visible; AutoAreaBox.IsChecked = true;
+            ProgressText.Text = suggestion.Message + " La vista previa es anterior a la exclusión de encabezados internos.";
+        }
+        catch (Exception ex) { ProgressText.Text = "No se pudo previsualizar: " + ex.Message; }
+        finally { SetControlsVisible(true); _detecting = false; DetectButton.IsEnabled = StartButton.IsEnabled = true; }
+    }
     private async void Start_Click(object sender, RoutedEventArgs e)
     {
-        if (_running) return;
+        if (_running || _detecting) return;
         if (_bounds.Width < 64 || _bounds.Height < 100 || (long)_bounds.Width * _bounds.Height > ScrollStitcher.DefaultMaxPixels)
         { ProgressText.Text = "Elige un área de al menos 64 × 100 px y como máximo 32 megapíxeles."; return; }
         int wait = new[] { 600, 1500, 3000 }[Math.Clamp(WaitBox.SelectedIndex, 0, 2)];
@@ -35,10 +55,17 @@ public partial class ScrollingCaptureWindow : Window
         try
         {
             SetControlsVisible(false); await Task.Delay(300);
-            var source = new WindowsScrollingSource(_bounds, wait, SetControlsVisible);
+            PixelBounds bounds = _bounds;
+            if (AutoAreaBox.IsChecked == true)
+            {
+                var suggestion = await WindowsScrollAreaDetector.DetectAsync(_bounds, _stop.Token);
+                bounds = _detectedBounds = suggestion.Bounds;
+                ProgressText.Text = suggestion.Message;
+            }
+            var source = new WindowsScrollingSource(bounds, wait, SetControlsVisible);
             source.Prepare();
             Result = await new ScrollingCaptureSession().CaptureAsync(source,
-                new Progress<ScrollProgress>(p => ProgressText.Text = $"{p.Width} × {p.Height} px · {p.Frames} partes unidas. Esc para terminar."), _stop.Token);
+                new Progress<ScrollProgress>(p => ProgressText.Text = $"{p.Width} × {p.Height} px · {p.Frames} partes unidas. Esc para terminar."), _stop.Token, detectFixedEdges: FixedEdgesBox.IsChecked == true);
             _running = false; DialogResult = true;
         }
         catch (OperationCanceledException) { _running = false; DialogResult = false; }
@@ -59,7 +86,7 @@ public partial class ScrollingCaptureWindow : Window
     private void Finish_Click(object sender, RoutedEventArgs e) => _stop.Cancel();
     private void Cancel_Click(object sender, RoutedEventArgs e) => Close();
     private void Window_Closing(object? sender, CancelEventArgs e)
-    { if (_running) { e.Cancel = true; _stop.Cancel(); } }
+    { if (_detecting) e.Cancel = true; else if (_running) { e.Cancel = true; _stop.Cancel(); } }
     private void Window_KeyDown(object sender, KeyEventArgs e)
     { if (e.Key == Key.Escape) { if (_running) _stop.Cancel(); else Close(); e.Handled = true; } }
 }

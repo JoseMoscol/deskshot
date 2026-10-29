@@ -2,14 +2,19 @@
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  Style="{StaticResource {x:Type Window}}" Title="DeskShot · Captura con desplazamiento"
- Width="510" SizeToContent="Height" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+ Width="540" SizeToContent="Height" MaxHeight="{x:Static SystemParameters.PrimaryScreenHeight}" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
  Topmost="True" Closing="Window_Closing" PreviewKeyDown="Window_KeyDown">
- <StackPanel Margin="26">
+ <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="26">
   <TextBlock Text="PÁGINAS Y DOCUMENTOS" Foreground="{StaticResource AccentBrush}" FontSize="11" />
   <TextBlock x:Name="Heading" Text="Captura con desplazamiento" FontSize="24" FontWeight="SemiBold" Margin="0,9,0,12" TextWrapping="Wrap" />
   <StackPanel x:Name="SetupPanel">
    <TextBlock Text="Coloca el documento al inicio antes de seleccionar el área. Se capturará desde su posición actual hacia abajo." Style="{StaticResource MutedText}" />
-   <TextBlock Text="El área debe contener solo la parte que se desplaza: excluye barras del navegador, encabezados fijos y la barra de desplazamiento. Mantén el zoom del documento durante la captura." TextWrapping="Wrap" Margin="0,12,0,16" />
+   <TextBlock Text="Centra tu selección sobre el documento. La detección busca su área desplazable y valida qué bordes permanecen fijos. Mantén el zoom del documento durante el recorrido." TextWrapping="Wrap" Margin="0,12,0,12" />
+   <CheckBox x:Name="AutoAreaBox" Content="Detectar automáticamente el área desplazable" IsChecked="True"/>
+   <CheckBox x:Name="FixedEdgesBox" Content="Excluir encabezados y bordes fijos" IsChecked="True"/>
+   <Button x:Name="DetectButton" Content="Detectar y previsualizar área" Click="Detect_Click" HorizontalAlignment="Left" Margin="0,8,0,10"/>
+   <Image x:Name="AreaPreview" Height="100" Stretch="Uniform" Visibility="Collapsed" Margin="0,0,0,10" AutomationProperties.Name="Previsualización del área detectada"/>
+   <TextBlock Text="Si la vista previa no corresponde al documento, desactiva la detección y usa la selección manual. En patrones repetidos o sin movimiento la captura se detiene y conserva el resultado parcial." Style="{StaticResource MutedText}" FontSize="11" Margin="0,0,0,12"/>
    <TextBlock Text="Espera después de cada desplazamiento" FontWeight="SemiBold" Margin="0,0,0,8" />
    <ComboBox x:Name="WaitBox" SelectedIndex="0" AutomationProperties.Name="Espera del desplazamiento"><ComboBoxItem Content="Normal · 0,6 segundos" /><ComboBoxItem Content="Contenido lento · 1,5 segundos" /><ComboBoxItem Content="Contenido muy lento · 3 segundos" /></ComboBox>
    <TextBlock Text="No uses el ratón ni cambies de ventana durante la captura. Esc termina y conserva lo capturado. PNG mantiene todos los píxeles; JPG comprime con pérdida." Style="{StaticResource MutedText}" FontSize="12" Margin="0,15,0,14" />
@@ -20,5 +25,5 @@
    <Button x:Name="StartButton" Content="Iniciar captura" Style="{StaticResource AccentButton}" Click="Start_Click" />
    <Button x:Name="FinishButton" Content="Terminar y abrir editor" Click="Finish_Click" Visibility="Collapsed" Style="{StaticResource AccentButton}" />
   </StackPanel>
- </StackPanel>
+ </StackPanel></ScrollViewer>
 </Window>

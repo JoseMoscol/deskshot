@@ -10,12 +10,13 @@
   <Grid Margin="24,20">
    <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
    <StackPanel><TextBlock Text="Tu captura, a tu manera." FontSize="23" FontWeight="SemiBold" /><TextBlock x:Name="DimensionsText" Foreground="{StaticResource MutedBrush}" Margin="0,6,0,0" /></StackPanel>
-   <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+   <WrapPanel Grid.Column="1" VerticalAlignment="Center" MaxWidth="650" HorizontalAlignment="Right">
+    <Button x:Name="PdfButton" Content="PDF…" Click="Pdf_Click" ToolTip="Exportar esta captura o reunir varias en un PDF" Margin="0,0,8,0" />
     <Button Content="Copiar" Click="Copy_Click" ToolTip="Copiar la imagen editada (Ctrl+C)" Margin="0,0,8,0" />
     <Button Content="Anclar" Click="Pin_Click" ToolTip="Anclar esta versión encima de otras ventanas (Ctrl+I)" Margin="0,0,8,0" />
     <Button Content="Guardar como…" Click="SaveAs_Click" ToolTip="Elegir nombre y formato (Ctrl+Shift+S)" Margin="0,0,8,0" />
     <Button Content="Guardar" Click="Save_Click" Style="{StaticResource AccentButton}" ToolTip="Guardar en tu carpeta configurada (Ctrl+S)" />
-   </StackPanel>
+   </WrapPanel>
   </Grid>
   <Border Grid.Row="1" Background="#17212E" BorderBrush="#2C3A4D" BorderThickness="0,1" Padding="20,10">
    <StackPanel>

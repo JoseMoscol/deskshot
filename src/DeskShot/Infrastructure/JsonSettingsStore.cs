@@ -21,7 +21,16 @@ public sealed class JsonSettingsStore : ISettingsStore
     public AppSettings Load()
     {
         if (!File.Exists(_path)) return new AppSettings();
-        try { return (JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(_path), Options) ?? new AppSettings()).Validate(); }
+        try
+        {
+            string json = File.ReadAllText(_path);
+            var settings = JsonSerializer.Deserialize<AppSettings>(json, Options) ?? new AppSettings();
+            using var document = JsonDocument.Parse(json);
+            // Las preferencias anteriores no tenían OCR: conservar su atajo de captura aunque usara Ctrl+Shift+3.
+            if (document.RootElement.ValueKind == JsonValueKind.Object && !document.RootElement.TryGetProperty(nameof(AppSettings.OcrShortcut), out _) && settings.Shortcut == settings.OcrShortcut)
+                settings = settings with { OcrShortcut = new(ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt, Key.D3) };
+            return settings.Validate();
+        }
         catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException or ArgumentException)
         {
             LoadWarning = "No se pudo leer la configuración. Se usarán los valores iniciales. El archivo original se conserva.";

@@ -1,0 +1,38 @@
+<Window x:Class="DeskShot.Presentation.PdfExportWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Style="{StaticResource {x:Type Window}}" Title="DeskShot · Exportar PDF" Width="760" Height="660" MinWidth="650" MinHeight="540" WindowStartupLocation="CenterOwner" Closing="Window_Closing">
+ <Grid Margin="26">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <StackPanel>
+   <TextBlock Text="CAPTURAS EN UN DOCUMENTO" Foreground="{StaticResource AccentBrush}" FontSize="11"/>
+   <TextBlock Text="Exportar a PDF" FontSize="28" FontWeight="SemiBold" Margin="0,8,0,8"/>
+   <TextBlock Text="Añade imágenes y ordénalas. Las capturas largas se reparten en páginas, conservando todos sus píxeles." Style="{StaticResource MutedText}" Margin="0,0,0,16"/>
+  </StackPanel>
+  <Grid Grid.Row="1" Margin="0,0,0,16">
+   <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+   <ListBox x:Name="CaptureList" DisplayMemberPath="Name" Background="#121C29" Foreground="#F1F5FA" BorderBrush="#314157" Padding="8" SelectionChanged="Selection_Changed" AutomationProperties.Name="Capturas del PDF">
+    <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem"><Setter Property="Padding" Value="10,9"/><Setter Property="HorizontalContentAlignment" Value="Stretch"/><Style.Triggers><Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="#274438"/><Setter Property="Foreground" Value="#FFFFFF"/></Trigger></Style.Triggers></Style></ListBox.ItemContainerStyle>
+   </ListBox>
+   <StackPanel Grid.Column="1" Margin="12,0,0,0" x:Name="ListControls">
+    <Button Content="Añadir imágenes…" Click="Add_Click" Margin="0,0,0,12"/>
+    <Button x:Name="UpButton" Content="Subir ↑" Click="Up_Click" Margin="0,0,0,8"/>
+    <Button x:Name="DownButton" Content="Bajar ↓" Click="Down_Click" Margin="0,0,0,8"/>
+    <Button x:Name="RemoveButton" Content="Quitar" Click="Remove_Click"/>
+   </StackPanel>
+  </Grid>
+  <StackPanel Grid.Row="2">
+   <WrapPanel x:Name="OptionsPanel">
+    <StackPanel Margin="0,0,16,12"><TextBlock Text="Papel" Margin="0,0,0,6"/><ComboBox x:Name="PaperBox" Width="150" SelectedIndex="0" SelectionChanged="Options_Changed" AutomationProperties.Name="Papel del PDF"><ComboBoxItem Content="A4"/><ComboBoxItem Content="Carta"/></ComboBox></StackPanel>
+    <StackPanel Margin="0,0,0,12"><TextBlock Text="Orientación" Margin="0,0,0,6"/><ComboBox x:Name="OrientationBox" Width="170" SelectedIndex="0" SelectionChanged="Options_Changed" AutomationProperties.Name="Orientación del PDF"><ComboBoxItem Content="Vertical"/><ComboBoxItem Content="Horizontal"/></ComboBox></StackPanel>
+   </WrapPanel>
+   <TextBlock x:Name="StatusText" TextWrapping="Wrap" Foreground="{StaticResource AccentBrush}" Margin="0,2,0,8" AutomationProperties.LiveSetting="Polite"/>
+   <ProgressBar x:Name="ExportProgress" Height="6" Maximum="100" Visibility="Collapsed" Margin="0,0,0,12"/>
+   <TextBlock Text="Exportación local y sin compresión con pérdida. El PDF contiene las imágenes finales; no incluye una capa de texto OCR ni anotaciones editables." Style="{StaticResource MutedText}" FontSize="12" Margin="0,0,0,16"/>
+  </StackPanel>
+  <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+   <Button x:Name="CloseButton" Content="Cerrar" Click="Close_Click" Margin="0,0,8,0"/>
+   <Button x:Name="ExportButton" Content="Guardar PDF…" Click="Export_Click" Style="{StaticResource AccentButton}"/>
+  </StackPanel>
+ </Grid>
+</Window>

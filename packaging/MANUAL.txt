@@ -25,10 +25,28 @@ PRIMERA CAPTURA
   Esc cierra la referencia temporal; guardala antes si quieres conservarla.
 
 DESPLAZAMIENTO
-Pon el documento al inicio y selecciona solo el contenido que se mueve.
-Excluye encabezados fijos y barras. Pulsa Desplazar > Iniciar captura.
-Esc termina y conserva lo capturado. La seleccion automatica del area
-y la exclusion automatica de encabezados todavia no estan implementadas.
+Pon el documento al inicio y selecciona aproximadamente su contenido.
+Pulsa Desplazar > Detectar y previsualizar area. La deteccion automatica
+busca el panel desplazable y valida la exclusion de encabezados y bordes.
+Puedes desactivar las dos opciones para usar un encuadre manual.
+Pulsa Iniciar captura; Esc termina y conserva lo capturado. Revisa el
+resultado: contenido repetido, animaciones y cambios de diseno pueden
+impedir detectar el area o unirla con seguridad.
+
+OCR RAPIDO
+Ctrl + Shift + 3: seleccionar texto y soltar para reconocerlo y copiarlo
+automaticamente. Motor local en espanol e ingles; no guarda la imagen.
+Si no encuentra texto o falla, no sustituye el portapapeles. Puedes
+corregir el resultado y copiarlo de nuevo. Atajo propio en Configuracion.
+
+PDF
+PDF... en el editor incluye la captura anotada y censurada.
+Crear PDF permite anadir PNG/JPG y ordenar las imagenes con Subir/Bajar.
+Elige A4 o Carta, vertical u horizontal. Las imagenes largas se reparten
+en paginas conservando sus pixeles con compresion sin perdida.
+Guardar PDF... muestra progreso y permite cancelar sin danar el destino.
+Hasta 50 imagenes, 32 megapixeles por imagen, 160 por PDF y 500 paginas.
+El documento contiene imagenes finales; no incluye una capa de texto OCR.
 
 ACTUALIZAR Y QUITAR
 Abre Actualizaciones > Buscar actualizaciones > Descargar actualizacion.
@@ -39,7 +57,7 @@ y vuelve a abrirse al terminar. Se conserva la carpeta de instalacion.
 En Configuracion puedes activar buscar al iniciar (desactivado por defecto).
 No se descarga ni instala sin tu accion. Solo se consulta GitHub; las
 capturas y el OCR siguen siendo locales y no se envian.
-Si vienes de 0.6.0 o anterior, instala 0.7.0 manualmente una vez.
+Si vienes de 0.6.0 o anterior, instala 0.8.0 manualmente una vez.
 Las descargas quedan en %LOCALAPPDATA%\DeskShot\Updates.
 Antes de desinstalar, sal de DeskShot desde la bandeja.
 Para quitarlo usa Configuracion de Windows > Aplicaciones > DeskShot.

@@ -8,6 +8,7 @@ public partial class MainWindow : Window
 {
     private readonly App _app;
     private ShortcutSettings _pendingShortcut = ShortcutSettings.Default;
+    private ShortcutSettings _pendingOcrShortcut = ShortcutSettings.OcrDefault;
 
     public MainWindow(App app)
     {
@@ -18,8 +19,8 @@ public partial class MainWindow : Window
     }
 
     public void SetStatus(string message) => StatusText.Text = message;
-    public void SetBusy(bool busy) { RegionButton.IsEnabled = DesktopButton.IsEnabled = ScrollButton.IsEnabled = UpdatesButton.IsEnabled = !busy; }
-    public bool IsEditingShortcut => IsVisible && ShortcutBox.IsKeyboardFocusWithin;
+    public void SetBusy(bool busy) { RegionButton.IsEnabled = DesktopButton.IsEnabled = ScrollButton.IsEnabled = QuickOcrButton.IsEnabled = PdfButton.IsEnabled = UpdatesButton.IsEnabled = !busy; }
+    public bool IsEditingShortcut => IsVisible && (ShortcutBox.IsKeyboardFocusWithin || OcrShortcutBox.IsKeyboardFocusWithin);
 
     public void ShowHome()
     {
@@ -43,6 +44,8 @@ public partial class MainWindow : Window
     private async void CaptureScroll_Click(object sender, RoutedEventArgs e) => await _app.CaptureAsync(true, scrolling: true);
     private void Exit_Click(object sender, RoutedEventArgs e) => _app.ExitApplication();
     private void Updates_Click(object sender, RoutedEventArgs e) => _app.ShowUpdates();
+    private void Pdf_Click(object sender, RoutedEventArgs e) => _app.ShowPdf();
+    private async void QuickOcr_Click(object sender, RoutedEventArgs e) => await _app.CaptureAsync(true, quickOcr: true);
 
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
     {
@@ -72,8 +75,8 @@ public partial class MainWindow : Window
             SetStatus("Combina Ctrl, Alt, Shift o Win con una letra, número o tecla F.");
             return;
         }
-        _pendingShortcut = shortcut;
-        ShortcutBox.Text = shortcut.ToString();
+        if (ReferenceEquals(sender, OcrShortcutBox)) { _pendingOcrShortcut = shortcut; OcrShortcutBox.Text = shortcut.ToString(); }
+        else { _pendingShortcut = shortcut; ShortcutBox.Text = shortcut.ToString(); }
         SetStatus("Pulsa Guardar configuración para aplicar el nuevo atajo.");
     }
 
@@ -86,6 +89,9 @@ public partial class MainWindow : Window
     {
         var settings = _app.Settings;
         _pendingShortcut = settings.Shortcut;
+        _pendingOcrShortcut = settings.OcrShortcut;
+        OcrShortcutBox.Text = settings.OcrShortcut.ToString();
+        OcrShortcutSummary.Text = settings.OcrShortcut + " · motor local de español e inglés";
         ShortcutBox.Text = settings.Shortcut.ToString();
         ShortcutSummary.Text = settings.Shortcut.ToString();
         FolderBox.Text = settings.SaveFolder;
@@ -108,7 +114,7 @@ public partial class MainWindow : Window
             if (!int.TryParse(DelayBox.Text, out int delay)) throw new ArgumentException("Introduce una espera entre 0 y 10 segundos.");
             var settings = new AppSettings
             {
-                Shortcut = _pendingShortcut, SaveFolder = FolderBox.Text.Trim(),
+                Shortcut = _pendingShortcut, OcrShortcut = _pendingOcrShortcut, SaveFolder = FolderBox.Text.Trim(),
                 Format = FormatBox.SelectedIndex == 0 ? ImageFileFormat.Png : ImageFileFormat.Jpeg,
                 JpegQuality = quality, CaptureDelaySeconds = delay,
                 CopyAfterCapture = CopyBox.IsChecked == true, AutoSave = AutoSaveBox.IsChecked == true,

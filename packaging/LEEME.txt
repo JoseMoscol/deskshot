@@ -20,9 +20,19 @@ USO RAPIDO
 - Ctrl + Shift + 2: seleccionar un area, ajustar bordes y anotar.
 - Copiar / Guardar: terminar la captura. Usa PNG para evitar perdida.
 - OCR: extraer texto y copiarlo al portapapeles.
-- Capturar con desplazamiento: documento al inicio, seleccionar solo
-  el contenido que se mueve y pulsar Desplazar > Iniciar captura.
-  Esc termina y conserva lo unido hasta ese momento.
+- Capturar con desplazamiento: documento al inicio, seleccionar
+  aproximadamente su contenido y pulsar Desplazar. Detectar y
+  previsualizar area propone un panel; la captura intenta excluir
+  encabezados y bordes fijos. Desactiva las opciones para un encuadre
+  manual. Esc termina y conserva lo unido hasta ese momento.
+- OCR rapido / Ctrl + Shift + 3: seleccionar texto y soltar para
+  reconocerlo y copiarlo automaticamente. No guarda la imagen.
+  Atajo configurable por separado. El motor sigue siendo local.
+- PDF... en el editor: exportar la captura con anotaciones y censura.
+  Crear PDF: reunir PNG/JPG y ordenar las imagenes con Subir/Bajar.
+  A4 o Carta, vertical u horizontal; las largas se reparten en paginas.
+  Conserva todos los pixeles con compresion sin perdida, sin capa OCR.
+  Hasta 50 imagenes, 32 megapixeles por imagen, 160 por PDF y 500 paginas.
 - Configuracion: atajo, carpeta, formato PNG/JPG y otras preferencias.
 - C: bloque opaco de censura. X: pixelado. D: desenfoque. Ajusta la
   intensidad de los filtros. Para datos sensibles usa un bloque solido.

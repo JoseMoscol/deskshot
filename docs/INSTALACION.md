@@ -2,14 +2,14 @@
 
 ## Descarga para Windows x64
 
-Abre [la última versión publicada](https://github.com/JoseMoscol/deskshot/releases/latest). En **Assets**, elige **DeskShot-0.7.0-win-x64-Setup.exe** para instalar, o **DeskShot-0.7.0-win-x64.zip** para usarlo en modo portable. Los archivos automáticos **Source code** contienen el proyecto para desarrolladores, no la aplicación preparada para ejecutar.
+Abre [la última versión publicada](https://github.com/JoseMoscol/deskshot/releases/latest). En **Assets**, elige **DeskShot-0.8.0-win-x64-Setup.exe** para instalar, o **DeskShot-0.8.0-win-x64.zip** para usarlo en modo portable. Los archivos automáticos **Source code** contienen el proyecto para desarrolladores, no la aplicación preparada para ejecutar.
 
 Ambas ediciones incluyen el runtime de .NET y los modelos OCR de español e inglés. No necesitas Visual Studio, el SDK ni instalar .NET por separado.
 
 ## Instalar con Setup.exe
 
 1. Cierra cualquier versión abierta desde el icono de DeskShot en la bandeja.
-2. Abre **DeskShot-0.7.0-win-x64-Setup.exe** y sigue el asistente en español.
+2. Abre **DeskShot-0.8.0-win-x64-Setup.exe** y sigue el asistente en español.
 3. Elige la carpeta de destino. Por defecto se instala para tu usuario en `%LOCALAPPDATA%\Programs\DeskShot`.
 4. El acceso de Inicio se crea automáticamente. Puedes elegir también un acceso en el escritorio.
 5. Al terminar puedes abrir DeskShot desde el asistente o desde Inicio.
@@ -37,7 +37,9 @@ La aplicación todavía no tiene firma de código.
 - **Censurar (C), Pixelar (X), Desenfocar (D):** arrastra una zona para ocultarla; los filtros tienen intensidad ajustable. Para datos sensibles usa un bloque sólido. El OCR no extrae texto de las áreas cubiertas por censura.
 - **Pasos (N):** haz clic varias veces para numerar 1, 2, 3…; usa Seleccionar (V) para mover o cambiar el tamaño. El campo Paso permite editar el número.
 - **Anclar / Ctrl+I:** conserva una copia encima de otras ventanas, con zoom y transparencia. Arrastra la barra para moverla; Ctrl+0 restablece la vista. Copiar conserva la resolución completa; Editor permite guardar la imagen. Esc cierra la referencia temporal.
-- **Capturar con desplazamiento** une un documento hacia abajo. Colócalo al principio y selecciona solo su contenido desplazable, excluyendo encabezados fijos y barras. **Esc** termina y conserva lo capturado.
+- **Capturar con desplazamiento** une un documento hacia abajo. Colócalo al principio, selecciona aproximadamente su contenido y pulsa Desplazar. Puedes **Detectar y previsualizar área**; las opciones automáticas intentan excluir encabezados y bordes fijos. Desactívalas si necesitas el encuadre manual. **Esc** termina y conserva lo capturado. Revisa el final: la detección puede detenerse en zonas repetidas o sin cambios.
+- **OCR rápido / Ctrl + Shift + 3:** arrastra sobre el texto y suelta para reconocerlo localmente y copiarlo automáticamente. No guarda la imagen. Puedes corregir el texto en el resultado; un OCR vacío o fallido no sustituye el portapapeles. El atajo se configura por separado del de captura.
+- **PDF…** en el editor exporta la captura con sus anotaciones y censuras. **Crear PDF** permite reunir PNG/JPG, ordenar las imágenes y repartir las largas en páginas A4 o Carta, en vertical u horizontal. Guarda todos los píxeles con compresión sin pérdida; contiene imágenes, sin capa de texto OCR. Admite hasta 50 imágenes, 32 megapíxeles por imagen, 160 por PDF y 500 páginas.
 - En **Configuración** puedes cambiar el atajo, la carpeta de guardado y PNG/JPG. Para conservar todos los detalles usa **PNG**; JPG comprime con pérdida.
 
 El [README](../README.md#uso) explica las herramientas y los límites de captura con más detalle.
@@ -48,7 +50,7 @@ Por defecto, cerrar la ventana principal deja DeskShot en la bandeja del sistema
 
 ## Actualizar
 
-**Desde 0.6.0 o anterior:** cierra DeskShot desde la bandeja y ejecuta una vez el instalador de la 0.7.0. No necesitas desinstalar antes. Esa actualización incorpora el nuevo menú.
+**Desde 0.6.0 o anterior:** cierra DeskShot desde la bandeja y ejecuta una vez el instalador de la 0.8.0. No necesitas desinstalar antes. Esa actualización incorpora el nuevo menú.
 
 **Desde la 0.7.0:**
 
@@ -74,7 +76,7 @@ Si usas el ZIP portable, sal de DeskShot y elimina la carpeta que extrajiste y s
 Cada descarga incluye su archivo `.sha256`. Puedes comprobar el instalador desde PowerShell (para el ZIP usa su nombre):
 
 ```powershell
-Get-FileHash .\DeskShot-0.7.0-win-x64-Setup.exe -Algorithm SHA256
+Get-FileHash .\DeskShot-0.8.0-win-x64-Setup.exe -Algorithm SHA256
 ```
 
 El resultado debe coincidir con el valor del archivo publicado. Los archivos de aplicación y los modelos del OCR se incluyen dentro del ZIP; no debes descargar DLLs sueltas de otros sitios.

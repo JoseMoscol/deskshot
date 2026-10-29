@@ -46,7 +46,7 @@
      <Button Content="OCR" Click="Ocr_Click" Padding="13,9" Margin="2" ToolTip="Extraer texto de la región original, sin conexión (Ctrl+T)" />
      <Button Content="Editor" Click="Editor_Click" Padding="13,9" Margin="2" ToolTip="Continuar en el editor completo (Ctrl+E)" />
      <Button Content="Anclar" Click="Pin_Click" Padding="13,9" Margin="2" ToolTip="Anclar una copia y terminar (Ctrl+I)" />
-     <Button x:Name="ScrollButton" Content="Desplazar" Click="Scroll_Click" Padding="13,9" Margin="2" ToolTip="Capturar hacia abajo en la ventana real. Selecciona solo el contenido desplazable, sin anotaciones." />
+     <Button x:Name="ScrollButton" Content="Desplazar" Click="Scroll_Click" Padding="13,9" Margin="2" ToolTip="Capturar hacia abajo en la ventana real. Centra la selección sobre el documento; podrás detectar el área automáticamente. Añade anotaciones después." />
      <Button Content="×" Click="Cancel_Click" Padding="13,9" Margin="2" ToolTip="Cancelar captura (Esc)" AutomationProperties.Name="Cancelar captura" />
     </WrapPanel>
    </Border>

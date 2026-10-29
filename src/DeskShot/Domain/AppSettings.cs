@@ -5,6 +5,7 @@ public enum ImageFileFormat { Png, Jpeg }
 public sealed record ShortcutSettings(ModifierKeys Modifiers, Key Key)
 {
     public static ShortcutSettings Default => new(ModifierKeys.Control | ModifierKeys.Shift, Key.D2);
+    public static ShortcutSettings OcrDefault => new(ModifierKeys.Control | ModifierKeys.Shift, Key.D3);
     public bool IsValid => Modifiers != ModifierKeys.None &&
         (Modifiers & ~(ModifierKeys.Control | ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Windows)) == 0 &&
         (Key is >= Key.A and <= Key.Z || Key is >= Key.D0 and <= Key.D9 || Key is >= Key.F1 and <= Key.F24 || Key == Key.PrintScreen);
@@ -27,6 +28,7 @@ public sealed record AppSettings
     public ImageFileFormat Format { get; init; } = ImageFileFormat.Png;
     public int JpegQuality { get; init; } = 95;
     public ShortcutSettings Shortcut { get; init; } = ShortcutSettings.Default;
+    public ShortcutSettings OcrShortcut { get; init; } = ShortcutSettings.OcrDefault;
     public bool AutoSave { get; init; }
     public bool CopyAfterCapture { get; init; } = true;
     public bool MinimizeToTray { get; init; } = true;
@@ -41,6 +43,8 @@ public sealed record AppSettings
         if (!Enum.IsDefined(Format)) throw new ArgumentException("El formato de imagen no es válido.");
         if (JpegQuality is < 1 or > 100) throw new ArgumentException("La calidad JPG debe estar entre 1 y 100.");
         if (Shortcut is null || !Shortcut.IsValid) throw new ArgumentException("Usa Ctrl, Alt, Shift o Win junto con una letra, número o tecla F.");
+        if (OcrShortcut is null || !OcrShortcut.IsValid) throw new ArgumentException("El atajo de OCR debe combinar Ctrl, Alt, Shift o Win con una letra, número o tecla F.");
+        if (Shortcut == OcrShortcut) throw new ArgumentException("La captura y el OCR rápido necesitan atajos distintos.");
         if (CaptureDelaySeconds is < 0 or > 10) throw new ArgumentException("La espera debe estar entre 0 y 10 segundos.");
         return this;
     }

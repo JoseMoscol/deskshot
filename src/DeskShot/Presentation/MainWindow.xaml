@@ -20,13 +20,14 @@
      <Button x:Name="SettingsNav" Content="Configuración" HorizontalContentAlignment="Left" Click="Settings_Click" Background="Transparent" BorderThickness="0" />
      <Button Content="Abrir carpeta" HorizontalContentAlignment="Left" Click="OpenFolder_Click" Background="Transparent" BorderThickness="0" Margin="0,10,0,0" />
      <Button x:Name="UpdatesButton" Content="Actualizaciones" HorizontalContentAlignment="Left" Click="Updates_Click" Background="Transparent" BorderThickness="0" Margin="0,10,0,0" />
+     <Button x:Name="PdfButton" Content="Crear PDF" HorizontalContentAlignment="Left" Click="Pdf_Click" Background="Transparent" BorderThickness="0" Margin="0,10,0,0" />
     </StackPanel>
     <StackPanel Grid.Row="2">
      <Border BorderBrush="#314238" Background="#172D27" BorderThickness="1" CornerRadius="8" Padding="12">
       <StackPanel><TextBlock Text="Capturas locales" Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold" /><TextBlock Text="OCR sin conexión." Style="{StaticResource MutedText}" FontSize="11" Margin="0,4,0,0" /></StackPanel>
      </Border>
      <Button Content="Salir de DeskShot" Click="Exit_Click" Background="Transparent" BorderThickness="0" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,12,0,0" />
-     <TextBlock Text="DESKSHOT / 0.7.0" Foreground="#728297" FontSize="10" HorizontalAlignment="Center" Margin="0,14,0,0" />
+     <TextBlock Text="DESKSHOT / 0.8.0" Foreground="#728297" FontSize="10" HorizontalAlignment="Center" Margin="0,14,0,0" />
     </StackPanel>
    </Grid>
   </Border>
@@ -62,6 +63,9 @@
        <StackPanel><TextBlock Text="TU ATAJO GLOBAL" Foreground="{StaticResource MutedBrush}" FontSize="10" /><TextBlock x:Name="ShortcutSummary" FontSize="17" Margin="0,9,0,0" /></StackPanel>
        <StackPanel Grid.Column="1"><TextBlock Text="FORMATO DE SALIDA" Foreground="{StaticResource MutedBrush}" FontSize="10" /><TextBlock x:Name="FormatSummary" FontSize="17" Margin="0,9,0,0" /></StackPanel>
       </Grid>
+      <Button x:Name="QuickOcrButton" Click="QuickOcr_Click" Margin="0,14,0,0" HorizontalContentAlignment="Left">
+       <StackPanel><TextBlock Text="OCR rápido · seleccionar y copiar texto" FontWeight="SemiBold"/><TextBlock x:Name="OcrShortcutSummary" Foreground="{StaticResource AccentBrush}" FontSize="12" Margin="0,4,0,0"/></StackPanel>
+      </Button>
       <Border BorderBrush="#293547" BorderThickness="0,1,0,0" Margin="0,25,0,0" Padding="0,17,0,0">
        <TextBlock Text="Todo junto a tu selección: texto, dibujos, copiar, guardar y OCR local. Abre el editor completo cuando necesites más espacio." Style="{StaticResource MutedText}" FontSize="12" />
       </Border>
@@ -73,6 +77,9 @@
       <TextBlock Text="Atajo para capturar una región" FontWeight="SemiBold" Margin="0,0,0,8" />
       <TextBox x:Name="ShortcutBox" IsReadOnly="True" PreviewKeyDown="ShortcutBox_PreviewKeyDown" AutomationProperties.Name="Atajo global de captura" ToolTip="Haz clic y pulsa tu combinación. Ejemplo: Ctrl + Shift + 2." />
       <TextBlock Text="Haz clic en el campo y pulsa Ctrl, Alt, Shift o Win + una letra, número o tecla F." Style="{StaticResource MutedText}" FontSize="11" Margin="0,5,0,16" />
+      <TextBlock Text="Atajo para OCR rápido" FontWeight="SemiBold" Margin="0,0,0,8" />
+      <TextBox x:Name="OcrShortcutBox" IsReadOnly="True" PreviewKeyDown="ShortcutBox_PreviewKeyDown" AutomationProperties.Name="Atajo global de OCR rápido"/>
+      <TextBlock Text="Selecciona una región y el texto se copia automáticamente. Funciona sin internet y no guarda la imagen." Style="{StaticResource MutedText}" FontSize="11" Margin="0,5,0,16"/>
       <TextBlock Text="Carpeta de destino" FontWeight="SemiBold" Margin="0,0,0,8" />
       <DockPanel><Button DockPanel.Dock="Right" Content="Elegir…" Click="BrowseFolder_Click" Margin="10,0,0,0" /><TextBox x:Name="FolderBox" AutomationProperties.Name="Carpeta de destino" /></DockPanel>
       <Grid Margin="0,18,0,0">

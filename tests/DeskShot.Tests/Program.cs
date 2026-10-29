@@ -26,6 +26,11 @@ internal static partial class Program
         if (args.Contains("--floating-demo")) return ShowFloatingDemo(app);
         if (args.Contains("--features-demo")) return ShowFeaturesDemo(app);
         if (args.Contains("--updates-demo")) return ShowUpdatesDemo(app);
+        if (args.Contains("--capture-tools-demo")) return ShowCaptureTools(app);
+        if (args.Contains("--quick-ocr-demo")) return ShowQuickDemo(app);
+        if (args.Contains("--smart-scroll-document")) return ShowSmartDocument(app);
+        if (args.Contains("--smart-scroll-demo")) return ShowSmartDemo(app);
+        if (args.Contains("--verify-smart-scroll-demo")) { Run("Documento real: ocho bloques y exclusión de encabezados", VerifySmartResult); return _failed == 0 ? 0 : 1; }
         if (args.Contains("--update-network")) { Run("Actualizaciones: descarga real de GitHub sin instalar", TestUpdateNetwork); return _failed == 0 ? 0 : 1; }
         if (args.Contains("--update-handoff")) { Run("Actualizaciones: espera, instalación y reinicio con ejecutables sintéticos", TestUpdateHandoff); return _failed == 0 ? 0 : 1; }
         if (args.Contains("--scroll-document")) return ShowScrollDocument(app);
@@ -79,6 +84,14 @@ internal static partial class Program
         Run("Actualizaciones: redirecciones HTTPS permitidas y bloqueadas", TestUpdateRedirects);
         Run("Actualizaciones: cancelación limpia archivos incompletos", TestUpdateCancellation);
         Run("Actualizaciones: controles de búsqueda, descarga y errores", () => TestUpdateWindow(app));
+        Run("Desplazamiento inteligente: encabezados, laterales y scrollbar", TestSmartScroll);
+        Run("Desplazamiento inteligente: ambigüedad y conservación del parcial", TestSmartScrollAmbiguity);
+        Run("PDF: reparto de filas, papel y límites", TestPdfLayout);
+        Run("PDF: archivo completo, cultura, censura y cancelación", TestPdfWriter);
+        Run("PDF: controles, orden y carga de imágenes", TestPdfWindow);
+        Run("OCR rápido: copia local, vacío, error y cierre", () => TestQuickOcr(app));
+        Run("OCR rápido: dos atajos y migración de preferencias", TestOcrSettingsMigration);
+        if (!args.Contains("--skip-hotkeys")) Run("Atajos de captura y OCR: intercambio y rollback", TestHotkeyPair);
         if (args.Contains("--desktop")) Run("Captura real del escritorio a dimensiones nativas", TestDesktopCapture);
         Console.WriteLine($"\n{_passed} pruebas correctas; {_failed} fallidas. Evidencias: {_output}");
         return _failed == 0 ? 0 : 1;

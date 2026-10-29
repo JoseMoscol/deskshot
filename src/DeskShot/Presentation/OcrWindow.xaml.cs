@@ -11,20 +11,28 @@ public partial class OcrWindow : Window
     private bool _closed;
     private bool _copying;
     private bool _started;
+    private readonly bool _autoCopy;
 
-    public OcrWindow(IOcrEngine engine, BitmapSource original, Func<string, Task>? copyText = null)
+    public OcrWindow(IOcrEngine engine, BitmapSource original, Func<string, Task>? copyText = null, bool autoCopy = false)
     {
         _engine = engine;
         _image = original;
         _copyText = copyText ?? App.CopyTextAsync;
+        _autoCopy = autoCopy;
         InitializeComponent();
+        if (autoCopy)
+        {
+            Title = "DeskShot · OCR rápido · copia automática de texto";
+            HeadingText.Text = "OCR rápido";
+            DescriptionText.Text = "El texto reconocido se copia automáticamente al portapapeles. La imagen no se guarda. Puedes corregir el resultado y volver a copiarlo.";
+        }
         Loaded += async (_, _) => { if (!_started) { _started = true; await ExtractAsync(); } };
         Closed += (_, _) => { _closed = true; _recognition?.Cancel(); };
     }
 
     private async void Extract_Click(object sender, RoutedEventArgs e) => await ExtractAsync();
 
-    private async Task ExtractAsync()
+    internal async Task ExtractAsync()
     {
         if (_recognition is not null || _closed) return;
         using var cancellation = new CancellationTokenSource();
@@ -40,6 +48,15 @@ public partial class OcrWindow : Window
             OcrStatus.Text = string.IsNullOrWhiteSpace(result.Text)
                 ? "No se detectó texto. Prueba una captura más ajustada y con texto nítido."
                 : $"{result.Regions.Count} palabras detectadas · {result.Text.Length:N0} caracteres. Revisa el texto antes de copiarlo.";
+            if (_autoCopy && !string.IsNullOrWhiteSpace(result.Text))
+            {
+                try
+                {
+                    await _copyText(result.Text);
+                    if (!_closed) OcrStatus.Text = "Texto copiado automáticamente. Puedes pegarlo con Ctrl+V o corregirlo aquí.";
+                }
+                catch (Exception ex) { if (!_closed) OcrStatus.Text = "Texto reconocido; no se pudo copiar: " + ex.Message + " Usa Copiar texto para volver a intentarlo."; }
+            }
         }
         catch (OperationCanceledException) when (cancellation.IsCancellationRequested)
         {

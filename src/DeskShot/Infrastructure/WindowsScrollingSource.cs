@@ -17,7 +17,7 @@ public sealed class WindowsScrollingSource : IScrollingCaptureSource
     public WindowsScrollingSource(PixelBounds bounds, int settleMilliseconds, Action<bool> showControls)
     {
         _bounds = bounds; _settleMilliseconds = settleMilliseconds; _showControls = showControls;
-        _scrollPoint = new() { X = bounds.X + Math.Min(24, bounds.Width / 4), Y = bounds.Y + bounds.Height / 2 };
+        _scrollPoint = new() { X = bounds.X + bounds.Width / 2, Y = bounds.Y + bounds.Height / 2 };
     }
 
     public void Prepare()

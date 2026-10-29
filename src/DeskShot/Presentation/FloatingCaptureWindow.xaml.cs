@@ -6,7 +6,7 @@ using DeskShot.Infrastructure;
 
 namespace DeskShot.Presentation;
 
-public enum FloatingCaptureAction { Cancel, Completed, OpenEditor, Scroll }
+public enum FloatingCaptureAction { Cancel, Completed, OpenEditor, Scroll, QuickOcr }
 
 public partial class FloatingCaptureWindow : Window
 {
@@ -18,6 +18,7 @@ public partial class FloatingCaptureWindow : Window
     private bool _areaMode = true;
     private bool _busy;
     private bool _syncProperties;
+    private readonly bool _quickOcr;
     private RegionHandle? _regionHandle;
     private Int32Rect _startRegion;
     private Point _startPoint;
@@ -29,8 +30,9 @@ public partial class FloatingCaptureWindow : Window
     private static readonly Color[] Palette = [Color.FromRgb(255, 107, 107), Color.FromRgb(120, 231, 195),
         Color.FromRgb(255, 220, 70), Color.FromRgb(87, 166, 255), Colors.White, Colors.Black];
 
-    public FloatingCaptureWindow(App app, DesktopFrame frame, bool selectWholeDesktop = false, bool scrolling = false)
+    public FloatingCaptureWindow(App app, DesktopFrame frame, bool selectWholeDesktop = false, bool scrolling = false, bool quickOcr = false)
     {
+        _quickOcr = quickOcr;
         _app = app;
         _frame = frame;
         Document = new CaptureDocument(frame.Image);
@@ -38,7 +40,8 @@ public partial class FloatingCaptureWindow : Window
         _chrome = new CaptureChrome(Document.Width, Document.Height);
         InitializeComponent();
         ExtraOptions.Bind(_surface);
-        if (scrolling) Status("Captura con desplazamiento: selecciona solo el contenido que se mueve, excluyendo encabezados y barras. Pulsa Desplazar para continuar.");
+        if (scrolling) Status("Selecciona aproximadamente el documento. Centra la selección sobre la zona que se desplaza; podrás activar la detección automática al continuar con Desplazar.");
+        if (quickOcr) Status("OCR rápido: arrastra sobre el texto y suelta para extraerlo y copiarlo. Esc cancela. No se guarda la imagen.");
         SurfaceHost.Children.Add(_surface);
         ChromeHost.Children.Add(_chrome);
         _surface.ToolChanged += (_, _) => { _areaMode = false; RefreshToolButtons(); };
@@ -79,7 +82,7 @@ public partial class FloatingCaptureWindow : Window
         _chrome.Region = _hasSelection || _regionHandle is not null ? region : null;
         _chrome.InvalidateVisual();
         _surface.InteractionBounds = _hasSelection ? new Rect(region.X, region.Y, region.Width, region.Height) : null;
-        bool show = _hasSelection && _regionHandle is null;
+        bool show = _hasSelection && _regionHandle is null && !_quickOcr;
         ToolsPanel.Visibility = ActionsPanel.Visibility = show ? Visibility.Visible : Visibility.Collapsed;
         _surface.IsHitTestVisible = show && !_busy;
         if (!show || Root.ActualWidth <= 0 || Root.ActualHeight <= 0) return;
@@ -181,6 +184,8 @@ public partial class FloatingCaptureWindow : Window
         Root.ReleaseMouseCapture();
         if (region.Width >= 2 && region.Height >= 2) SelectRegion(region);
         else RefreshRegion();
+        if (_quickOcr && region.Width >= 2 && region.Height >= 2)
+        { ResultAction = FloatingCaptureAction.QuickOcr; DialogResult = true; }
         e.Handled = true;
     }
 
@@ -386,6 +391,11 @@ public partial class FloatingCaptureWindow : Window
     }
     private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        if (_quickOcr)
+        {
+            if (e.Key == Key.Escape) Close();
+            e.Handled = true; return;
+        }
         if (Keyboard.FocusedElement is TextBoxBase && Keyboard.Modifiers.HasFlag(ModifierKeys.Control)
             && e.Key is Key.C or Key.X or Key.V or Key.A or Key.Z or Key.Y) return;
         if (_busy) { e.Handled = true; return; }

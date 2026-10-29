@@ -9,12 +9,14 @@ public sealed class GlobalHotkey : IDisposable
 {
     private readonly HwndSource _source;
     private int _activeId;
+    private readonly int _idBase;
     private bool _registered;
     public event EventHandler? Pressed;
     public ShortcutSettings? Current { get; private set; }
 
-    public GlobalHotkey(nint hwnd)
+    public GlobalHotkey(nint hwnd, int idBase = 0x531)
     {
+        _idBase = idBase;
         _source = HwndSource.FromHwnd(hwnd) ?? throw new InvalidOperationException("La ventana todavía no está lista.");
         _source.AddHook(WindowProcedure);
     }
@@ -24,7 +26,7 @@ public sealed class GlobalHotkey : IDisposable
         if (!shortcut.IsValid) throw new ArgumentException("El atajo no es válido.");
         if (_registered && shortcut == Current) return;
         // Registrar primero el nuevo: un conflicto no elimina el atajo anterior.
-        int candidateId = _activeId == 0x531 ? 0x532 : 0x531;
+        int candidateId = _activeId == _idBase ? _idBase + 1 : _idBase;
         uint modifiers = 0x4000; // MOD_NOREPEAT
         if (shortcut.Modifiers.HasFlag(ModifierKeys.Alt)) modifiers |= 1;
         if (shortcut.Modifiers.HasFlag(ModifierKeys.Control)) modifiers |= 2;
