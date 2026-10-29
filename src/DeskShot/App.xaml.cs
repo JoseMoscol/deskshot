@@ -130,7 +130,8 @@ public partial class App : System.Windows.Application
             await Task.Delay(220 + Settings.CaptureDelaySeconds * 1000);
             NativeMethods.DwmFlush();
             var frame = await Task.Run(_captureService.CaptureDesktop);
-            var floating = new FloatingCaptureWindow(this, frame, selectWholeDesktop: !region, scrolling: scrolling, quickOcr: quickOcr);
+            var floating = new FloatingCaptureWindow(this, frame, selectWholeDesktop: !region, scrolling: scrolling, quickOcr: quickOcr,
+                targets: region ? new WindowsCaptureTargetDetector(frame.Bounds) : null);
             if (floating.ShowDialog() != true)
             {
                 Dashboard.SetStatus("Captura cancelada.");

@@ -17,7 +17,11 @@ https://aka.ms/vc14/vc_redist.x64.exe
 El reconocimiento funciona sin internet y no envia tus capturas.
 
 USO RAPIDO
-- Ctrl + Shift + 2: seleccionar un area, ajustar bordes y anotar.
+- Ctrl + Shift + 2: mover el cursor y hacer clic para elegir un panel
+  o ventana detectados; arrastrar para recortar manualmente.
+  Tab: cambiar nivel. W: ventana/paneles. M: automatico/manual.
+  Despues de elegir puedes ajustar bordes y anotar como antes.
+  Algunas aplicaciones exponen solo su ventana, no los paneles internos.
 - Copiar / Guardar: terminar la captura. Usa PNG para evitar perdida.
 - OCR: extraer texto y copiarlo al portapapeles.
 - Capturar con desplazamiento: documento al inicio, seleccionar

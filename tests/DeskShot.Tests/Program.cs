@@ -23,6 +23,9 @@ internal static partial class Program
         Directory.CreateDirectory(_output);
         var app = new App(verificationMode: true);
         app.InitializeComponent();
+        if (args.Contains("--target-document")) return ShowTargetDocument(app);
+        if (args.Contains("--target-selector")) return ShowTargetSelector(app);
+        if (args.Contains("--verify-target-selector")) { Run("Selector real: clic en panel y OCR local", VerifyTargetResult); return _failed == 0 ? 0 : 1; }
         if (args.Contains("--floating-demo")) return ShowFloatingDemo(app);
         if (args.Contains("--features-demo")) return ShowFeaturesDemo(app);
         if (args.Contains("--updates-demo")) return ShowUpdatesDemo(app);
@@ -91,6 +94,9 @@ internal static partial class Program
         Run("PDF: controles, orden y carga de imágenes", TestPdfWindow);
         Run("OCR rápido: copia local, vacío, error y cierre", () => TestQuickOcr(app));
         Run("OCR rápido: dos atajos y migración de preferencias", TestOcrSettingsMigration);
+        Run("Selector de áreas: coordenadas físicas, jerarquía y clic", TestTargetGeometry);
+        Run("Selector de áreas: vista previa, niveles y salida sin bordes", () => TestTargetPreview(app));
+        Run("Selector de áreas: consultas tardías, errores y cierre", () => TestTargetAsync(app));
         if (!args.Contains("--skip-hotkeys")) Run("Atajos de captura y OCR: intercambio y rollback", TestHotkeyPair);
         if (args.Contains("--desktop")) Run("Captura real del escritorio a dimensiones nativas", TestDesktopCapture);
         Console.WriteLine($"\n{_passed} pruebas correctas; {_failed} fallidas. Evidencias: {_output}");

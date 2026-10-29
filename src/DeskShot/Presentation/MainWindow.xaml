@@ -27,7 +27,7 @@
       <StackPanel><TextBlock Text="Capturas locales" Foreground="{StaticResource AccentBrush}" FontWeight="SemiBold" /><TextBlock Text="OCR sin conexión." Style="{StaticResource MutedText}" FontSize="11" Margin="0,4,0,0" /></StackPanel>
      </Border>
      <Button Content="Salir de DeskShot" Click="Exit_Click" Background="Transparent" BorderThickness="0" FontSize="12" Foreground="{StaticResource MutedBrush}" Margin="0,12,0,0" />
-     <TextBlock Text="DESKSHOT / 0.8.0" Foreground="#728297" FontSize="10" HorizontalAlignment="Center" Margin="0,14,0,0" />
+     <TextBlock Text="DESKSHOT / 0.9.0" Foreground="#728297" FontSize="10" HorizontalAlignment="Center" Margin="0,14,0,0" />
     </StackPanel>
    </Grid>
   </Border>

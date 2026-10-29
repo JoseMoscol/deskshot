@@ -4,9 +4,9 @@ Aplicación de escritorio para **Windows**, escrita en **C# / .NET 10 / WPF**. C
 
 ## Descargar y ejecutar
 
-Descarga la aplicación preparada desde **[Releases · última versión](https://github.com/JoseMoscol/deskshot/releases/latest)**. Elige **DeskShot-0.8.0-win-x64-Setup.exe** para instalarla con asistente en español, acceso en Inicio y desinstalador. Se instala para tu usuario e incluye .NET, los idiomas OCR y el redistribuible oficial de Visual C++ x64, que solo se ejecuta cuando falta. Esa dependencia puede pedir permisos de administrador.
+Descarga la aplicación preparada desde **[Releases · última versión](https://github.com/JoseMoscol/deskshot/releases/latest)**. Elige **DeskShot-0.9.0-win-x64-Setup.exe** para instalarla con asistente en español, acceso en Inicio y desinstalador. Se instala para tu usuario e incluye .NET, los idiomas OCR y el redistribuible oficial de Visual C++ x64, que solo se ejecuta cuando falta. Esa dependencia puede pedir permisos de administrador.
 
-También está disponible **DeskShot-0.8.0-win-x64.zip**: usa **Extraer todo** y abre `DeskShot.exe` dentro de la carpeta extraída. Conserva todos sus archivos. Las dos ediciones incluyen .NET y los modelos OCR: no requieren Visual Studio, el SDK ni instalar .NET por separado. El ZIP necesita Visual C++ x64 disponible en el equipo. Los archivos automáticos Source code contienen el proyecto para compilar. Todavía no hay firma de código.
+También está disponible **DeskShot-0.9.0-win-x64.zip**: usa **Extraer todo** y abre `DeskShot.exe` dentro de la carpeta extraída. Conserva todos sus archivos. Las dos ediciones incluyen .NET y los modelos OCR: no requieren Visual Studio, el SDK ni instalar .NET por separado. El ZIP necesita Visual C++ x64 disponible en el equipo. Los archivos automáticos Source code contienen el proyecto para compilar. Todavía no hay firma de código.
 
 **[Manual de descarga, uso, actualización y desinstalación](docs/INSTALACION.md).**
 
@@ -16,13 +16,13 @@ Desde **Actualizaciones** en la ventana principal o **Buscar actualizaciones** e
 
 En Configuración puedes activar **Buscar actualizaciones al iniciar**, desactivado por defecto. Esta opción solo avisa; la descarga y la instalación requieren tu acción. No se envían imágenes ni texto OCR, no hay cuentas ni telemetría. Sin conexión puedes seguir capturando y usando OCR.
 
-**Si tienes la versión 0.6.0 o anterior, instala manualmente la 0.8.0 una vez para incorporar esta función.** Desde la edición portable, el botón instala la edición normal; para conservar el uso portable, descarga y extrae el nuevo ZIP en otra carpeta.
+**Si tienes la versión 0.6.0 o anterior, instala manualmente la 0.9.0 una vez para incorporar esta función.** Desde la edición portable, el botón instala la edición normal; para conservar el uso portable, descarga y extrae el nuevo ZIP en otra carpeta.
 
 Los instaladores verificados se conservan en `%LOCALAPPDATA%\DeskShot\Updates`. No hay actualizaciones diferenciales ni instalación silenciosa: se utiliza el asistente completo. La aplicación y el instalador siguen sin firma de código; el SHA-256 comprueba integridad respecto al Release, no sustituye una firma del editor.
 
 ## Ejecutar desde el proyecto
 
-Abre `artifacts/DeskShot-0.8.0/DeskShot.exe`, o haz doble clic en `Iniciar DeskShot.cmd` desde la raíz del proyecto. El lanzador compila si todavía no existe el ejecutable publicado. Si la versión anterior sigue en la bandeja, elige **Salir** en su menú antes de abrir esta actualización. La publicación separada conserva intactos los archivos de la instancia anterior y ambas versiones comparten la configuración existente.
+Abre `artifacts/DeskShot-0.9.0/DeskShot.exe`, o haz doble clic en `Iniciar DeskShot.cmd` desde la raíz del proyecto. El lanzador compila si todavía no existe el ejecutable publicado. Si la versión anterior sigue en la bandeja, elige **Salir** en su menú antes de abrir esta actualización. La publicación separada conserva intactos los archivos de la instancia anterior y ambas versiones comparten la configuración existente.
 
 - Para ejecutar: **.NET 10 Desktop Runtime** y una sesión interactiva de Windows 10/11.
 - El motor OCR nativo requiere **Microsoft Visual C++ Redistributable 2015–2022** de la arquitectura del proceso (x64 en este equipo). Sus bibliotecas ya estaban instaladas y se verificó el funcionamiento real del motor.
@@ -31,7 +31,7 @@ Abre `artifacts/DeskShot-0.8.0/DeskShot.exe`, o haz doble clic en `Iniciar DeskS
 
 ## Uso
 
-1. Pulsa **Capturar región** o **Ctrl + Shift + 2**. El escritorio se congela y oscurece; arrastra y suelta para elegir el área. La selección permanece abierta con sus barras flotantes.
+1. Pulsa **Capturar región** o **Ctrl + Shift + 2**. El escritorio se congela y oscurece. Mueve el cursor para resaltar un panel o ventana y haz clic para seleccionarlo, o arrastra para dibujar un recorte manual. La selección permanece abierta con sus barras flotantes.
 2. **Ajustar área (B):** arrastra el fondo para mover el encuadre. Sus ocho tiradores y todos sus bordes permiten ajustar el recorte antes de copiar o guardar. En este modo también puedes arrastrar fuera de la región para elegir otra. **Capturar escritorio completo** inicia el modo flotante con todo el escritorio seleccionado.
 3. La barra lateral ofrece **seleccionar (V), lápiz (P), flecha (A), rectángulo (R), resaltador (H) y texto (T)**. El cuadro de color abre la paleta y el grosor. Las anotaciones mantienen su edición, selección, movimiento y tamaño.
 4. **Copiar / Ctrl+C / Enter** copia la imagen compuesta y termina la captura. **Guardar / Ctrl+S** crea un archivo en la carpeta configurada y termina. **Ctrl+Shift+S** permite elegir nombre, ubicación y PNG/JPG.
@@ -79,6 +79,19 @@ La captura se detiene ante una unión ambigua, un salto excesivo, una ventana qu
 Se limita cada imagen a **32 megapíxeles, 60 000 px de alto y 300 avances** para contener el uso de memoria y detener páginas infinitas. Al alcanzar el límite se abre la parte capturada, sin reducirla. Captura documentos mayores por secciones. La ventana de origen queda en la última posición alcanzada. Estas limitaciones se comunican en el resultado; no se publica una imagen parcial como si fuese un documento completo.
 
 El OCR procesa imágenes de más de 8 000 px de alto por bloques, buscando una fila uniforme cerca de cada corte para reducir divisiones de texto. Mantiene las regiones de palabras en las coordenadas de la captura completa. La lectura sigue siendo local y no modifica la imagen; un corte sin espacio entre líneas puede requerir corregir el texto extraído.
+
+## Seleccionar ventanas y paneles
+
+Antes de confirmar una región, el selector resalta el área bajo el cursor y muestra sus dimensiones físicas. **Un clic** la elige y abre las herramientas flotantes; **arrastrar** siempre crea un recorte manual. La detección también está disponible en OCR rápido y al seleccionar el punto de partida de una captura con desplazamiento.
+
+- **Tab:** recorre las áreas detectadas bajo el cursor, desde un campo o panel hasta sus contenedores y la ventana.
+- **W:** alterna entre paneles y ventana completa.
+- **M:** activa o desactiva la detección para trabajar manualmente.
+- **Esc:** cancela. Una vez elegida la región puedes ajustar sus bordes y anotar como antes; los atajos de detección solo actúan antes de seleccionarla.
+
+Se congela la posición y el orden de las ventanas antes de mostrar la superposición. Los controles se consultan desde la ventana original con UI Automation y geometría Win32; el selector no se detecta a sí mismo. Las consultas se realizan en segundo plano, con límites de tiempo y de recorrido; si un proveedor no responde se puede seguir seleccionando la ventana o arrastrando. No se consultan el texto ni los nombres de los controles para detectar sus límites, ni se envían datos a servicios externos.
+
+No todas las aplicaciones exponen paneles o controles. Páginas con lienzos gráficos, aplicaciones elevadas, menús que desaparecen al perder el foco o ventanas que cambian después de la captura pueden ofrecer solo la ventana y su área cliente. La detección usa rectángulos; la forma redondeada o irregular de un control no se recorta como una máscara. Revisa el resaltado antes de hacer clic. Los bordes de previsualización y las etiquetas no se exportan.
 
 ## OCR rápido
 
@@ -149,7 +162,7 @@ Para generar también Setup.exe, usa `./build-installer.ps1 -Compiler RUTA/ISCC.
 
 `./verify-installer.ps1 -Installer RUTA/Setup.exe` prueba instalación, bloqueo de una instancia abierta, reinstalación y desinstalación. Usa una carpeta temporal del workspace; requiere que no exista otra instalación registrada, ni la carpeta instalada `%LOCALAPPDATA%\Programs\DeskShot`, ni un grupo de Inicio DeskShot, y que Visual C++ ya esté disponible. Se detiene antes de instalar si encuentra cualquiera de ellos: Inno Setup ignora `/GROUP` cuando su página de grupo está desactivada. Retira la copia de prueba al terminar, también si una comprobación falla. No prueba la instalación elevada del redistribuible. Comprueba que se conserven las preferencias del usuario y los archivos ajenos al programa.
 
-Para preparar la descarga portable de Windows x64, ejecuta `./package-release.ps1`. Publica con .NET incluido, valida los archivos necesarios y ejecuta las pruebas con un verificador autocontenido que utiliza exactamente la misma DLL de DeskShot. Genera el ZIP y su SHA-256 en `artifacts/releases/v0.8.0`. No sobrescribe paquetes existentes; los archivos temporales y las evidencias quedan en `artifacts/release-staging/`. La primera ejecución puede descargar los paquetes oficiales del runtime desde NuGet. `-SkipTests` omite las pruebas y se reserva para un paquete que ya se haya verificado.
+Para preparar la descarga portable de Windows x64, ejecuta `./package-release.ps1`. Publica con .NET incluido, valida los archivos necesarios y ejecuta las pruebas con un verificador autocontenido que utiliza exactamente la misma DLL de DeskShot. Genera el ZIP y su SHA-256 en `artifacts/releases/v0.9.0`. No sobrescribe paquetes existentes; los archivos temporales y las evidencias quedan en `artifacts/release-staging/`. La primera ejecución puede descargar los paquetes oficiales del runtime desde NuGet. `-SkipTests` omite las pruebas y se reserva para un paquete que ya se haya verificado.
 
 Desde PowerShell:
 
@@ -159,14 +172,14 @@ Desde PowerShell:
 .\build.ps1 -CheckDesktop
 ```
 
-El script compila, ejecuta las pruebas y publica en `artifacts/DeskShot-0.8.0`. Las pruebas verifican selección, historial, independencia del original, PNG 4K píxel a píxel, dimensiones y firmas JPG, anotaciones, configuración, atajos y render de la interfaz. También comprueban selección por orden de capas, tiradores solapados, movimiento y redimensionado con límites, un deshacer por gesto, cancelación, edición de texto, eliminación y controles de propiedades. El modo flotante añade pruebas de los ocho tiradores, ajuste de bordes, recorte exacto, historial de región, posición de las barras y continuidad con el editor. Ejecutan OCR real tanto de imágenes completas como de regiones anotadas, usando el original. Las previsualizaciones y resultados se generan en `artifacts/verification`.
+El script compila, ejecuta las pruebas y publica en `artifacts/DeskShot-0.9.0`. Las pruebas verifican selección, historial, independencia del original, PNG 4K píxel a píxel, dimensiones y firmas JPG, anotaciones, configuración, atajos y render de la interfaz. También comprueban selección por orden de capas, tiradores solapados, movimiento y redimensionado con límites, un deshacer por gesto, cancelación, edición de texto, eliminación y controles de propiedades. El modo flotante añade pruebas de los ocho tiradores, ajuste de bordes, recorte exacto, historial de región, posición de las barras y continuidad con el editor. Ejecutan OCR real tanto de imágenes completas como de regiones anotadas, usando el original. Las previsualizaciones y resultados se generan en `artifacts/verification`.
 
 Comandos individuales:
 
 ```powershell
 dotnet build DeskShot.slnx -c Release -m:1 -nr:false
 dotnet tests/DeskShot.Tests/bin/Release/net10.0-windows/DeskShot.Tests.dll artifacts/verification
-dotnet publish src/DeskShot/DeskShot.csproj -c Release --self-contained false -o artifacts/DeskShot-0.8.0 -m:1 -nr:false
+dotnet publish src/DeskShot/DeskShot.csproj -c Release --self-contained false -o artifacts/DeskShot-0.9.0 -m:1 -nr:false
 ```
 
 El registro real de atajos requiere una sesión interactiva de Windows con permiso para `RegisterHotKey`; un entorno aislado puede bloquearlo. La prueba libera sus atajos al terminar. Las previsualizaciones usan contenido sintético, no capturas del usuario.
@@ -184,6 +197,8 @@ En un entorno restringido que bloquee los atajos puedes ejecutar las otras prueb
 Las pruebas de actualizaciones cubren versiones estables, ausencia de retrocesos, URLs permitidas, redirecciones, tamaños, SHA-256, caché, archivos alterados, cancelaciones y controles WPF con una fuente HTTP simulada. `--update-network` comprueba la descarga real del último instalador público sin ejecutarlo. `--update-handoff` compila ejecutables sintéticos y verifica el asistente real: huella inválida, cancelación, espera del proceso padre, rutas con espacios y acentos, sustitución y reapertura. Esta última prueba usa su propia carpeta temporal y requiere que no exista una descarga del usuario en la carpeta de prueba `Updates\1.0.0`. `--updates-demo` abre la interfaz con datos simulados.
 
 Las pruebas de 0.8 verifican exclusión de encabezados, pies, laterales y scrollbar con unión píxel a píxel; rechazo de patrones ambiguos y conservación del parcial; copia automática de OCR válido y descarte de vacíos, errores y resultados tardíos; migración, intercambio y rollback de dos atajos; paginación PDF, límites, cultura decimal, censura y cancelación. `tests/verify_pdf_output.py artifacts/verification` usa `pypdf` y Pillow, solo para desarrollo, como comprobación independiente: abre el PDF en modo estricto y compara todos los bytes RGB de cada página con los PNG de origen. Renderiza con `pdftoppm` para inspección visual. El producto no requiere Python ni paquetes PDF externos.
+
+Las pruebas de 0.9 añaden coordenadas negativas y recorte de ventanas entre monitores, orden de áreas anidadas, diferencia entre clic y arrastre a distintos DPI, ausencia de cambios al previsualizar, preservación del nivel elegido, modo ventana/manual, salida sin bordes y descarte de consultas tardías tras mover el cursor o cerrar. Se verificó en Windows al 150 % de escala una aplicación WPF sintética en un proceso separado: detección de un campo de **878 × 644 px** debajo de la superposición, selección con un clic, cambio al panel contenedor con Tab, ventana con W y modo manual con M. El PNG conserva el tamaño del campo y el OCR local comprobó su texto. `--target-document` abre la aplicación de prueba, `--target-selector` el selector sobre ella y `--verify-target-selector` verifica el resultado; no modifican el portapapeles ni la instalación del usuario.
 
 Se verificó en Windows al 150 % de escala un documento WPF sintético: **29 partes, PNG de 1032 × 2640 px, ocho bloques reconocidos por OCR local y ausencia de la barra exterior y del encabezado fijo interno**. Esto no garantiza compatibilidad con todas las aplicaciones. Para reproducirlo: `--smart-scroll-document` abre el documento, `--smart-scroll-demo` abre el panel con una selección imprecisa y `--verify-smart-scroll-demo` comprueba el resultado. `--quick-ocr-demo` prueba una selección real con Tesseract y una copia simulada a un archivo de evidencias, sin modificar el portapapeles; se comprobaron español, inglés y acentos. `--capture-tools-demo` abre la lista PDF con imágenes sintéticas.
 

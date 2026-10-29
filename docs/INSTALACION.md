@@ -2,14 +2,14 @@
 
 ## Descarga para Windows x64
 
-Abre [la última versión publicada](https://github.com/JoseMoscol/deskshot/releases/latest). En **Assets**, elige **DeskShot-0.8.0-win-x64-Setup.exe** para instalar, o **DeskShot-0.8.0-win-x64.zip** para usarlo en modo portable. Los archivos automáticos **Source code** contienen el proyecto para desarrolladores, no la aplicación preparada para ejecutar.
+Abre [la última versión publicada](https://github.com/JoseMoscol/deskshot/releases/latest). En **Assets**, elige **DeskShot-0.9.0-win-x64-Setup.exe** para instalar, o **DeskShot-0.9.0-win-x64.zip** para usarlo en modo portable. Los archivos automáticos **Source code** contienen el proyecto para desarrolladores, no la aplicación preparada para ejecutar.
 
 Ambas ediciones incluyen el runtime de .NET y los modelos OCR de español e inglés. No necesitas Visual Studio, el SDK ni instalar .NET por separado.
 
 ## Instalar con Setup.exe
 
 1. Cierra cualquier versión abierta desde el icono de DeskShot en la bandeja.
-2. Abre **DeskShot-0.8.0-win-x64-Setup.exe** y sigue el asistente en español.
+2. Abre **DeskShot-0.9.0-win-x64-Setup.exe** y sigue el asistente en español.
 3. Elige la carpeta de destino. Por defecto se instala para tu usuario en `%LOCALAPPDATA%\Programs\DeskShot`.
 4. El acceso de Inicio se crea automáticamente. Puedes elegir también un acceso en el escritorio.
 5. Al terminar puedes abrir DeskShot desde el asistente o desde Inicio.
@@ -31,7 +31,7 @@ La aplicación todavía no tiene firma de código.
 
 ## Primera captura
 
-- **Capturar región**, o **Ctrl + Shift + 2**, abre el modo flotante. Selecciona un área y ajusta sus bordes antes de copiar o guardar.
+- **Capturar región**, o **Ctrl + Shift + 2**, abre el modo flotante. Mueve el cursor para resaltar una ventana o panel y haz clic para elegirlo; arrastra para recortar manualmente. **Tab** cambia entre los niveles detectados, **W** elige ventana/paneles y **M** alterna detección/manual, antes de confirmar la región. Después ajusta sus bordes antes de copiar o guardar. Algunas aplicaciones solo permiten detectar su ventana completa.
 - Las herramientas permiten dibujar, añadir texto, seleccionar, mover y redimensionar anotaciones.
 - **OCR** extrae texto localmente en español e inglés y permite copiarlo al portapapeles.
 - **Censurar (C), Pixelar (X), Desenfocar (D):** arrastra una zona para ocultarla; los filtros tienen intensidad ajustable. Para datos sensibles usa un bloque sólido. El OCR no extrae texto de las áreas cubiertas por censura.
@@ -50,7 +50,7 @@ Por defecto, cerrar la ventana principal deja DeskShot en la bandeja del sistema
 
 ## Actualizar
 
-**Desde 0.6.0 o anterior:** cierra DeskShot desde la bandeja y ejecuta una vez el instalador de la 0.8.0. No necesitas desinstalar antes. Esa actualización incorpora el nuevo menú.
+**Desde 0.6.0 o anterior:** cierra DeskShot desde la bandeja y ejecuta una vez el instalador de la 0.9.0. No necesitas desinstalar antes. Esa actualización incorpora el nuevo menú.
 
 **Desde la 0.7.0:**
 
@@ -76,7 +76,7 @@ Si usas el ZIP portable, sal de DeskShot y elimina la carpeta que extrajiste y s
 Cada descarga incluye su archivo `.sha256`. Puedes comprobar el instalador desde PowerShell (para el ZIP usa su nombre):
 
 ```powershell
-Get-FileHash .\DeskShot-0.8.0-win-x64-Setup.exe -Algorithm SHA256
+Get-FileHash .\DeskShot-0.9.0-win-x64-Setup.exe -Algorithm SHA256
 ```
 
 El resultado debe coincidir con el valor del archivo publicado. Los archivos de aplicación y los modelos del OCR se incluyen dentro del ZIP; no debes descargar DLLs sueltas de otros sitios.

@@ -10,7 +10,11 @@ para esa dependencia. No se necesita internet durante la instalacion.
 
 PRIMERA CAPTURA
 - Abre DeskShot desde Inicio o el escritorio.
-- Ctrl + Shift + 2 selecciona una region. Ajusta los bordes y anota.
+- Ctrl + Shift + 2 abre el selector. Mueve el cursor y haz clic para
+  elegir un panel o ventana detectados; arrastra para recortar a mano.
+  Tab cambia el nivel detectado. W: ventana/paneles. M: automatico/manual.
+  Estos atajos se usan antes de confirmar. Ajusta los bordes y anota.
+  Algunas aplicaciones no exponen paneles: usa su ventana o el arrastre.
 - Copiar o Guardar termina la captura. PNG conserva los detalles.
 - OCR extrae texto localmente en espanol e ingles.
 - En Configuracion puedes cambiar el atajo, la carpeta y PNG/JPG.
@@ -57,7 +61,7 @@ y vuelve a abrirse al terminar. Se conserva la carpeta de instalacion.
 En Configuracion puedes activar buscar al iniciar (desactivado por defecto).
 No se descarga ni instala sin tu accion. Solo se consulta GitHub; las
 capturas y el OCR siguen siendo locales y no se envian.
-Si vienes de 0.6.0 o anterior, instala 0.8.0 manualmente una vez.
+Si vienes de 0.6.0 o anterior, instala 0.9.0 manualmente una vez.
 Las descargas quedan en %LOCALAPPDATA%\DeskShot\Updates.
 Antes de desinstalar, sal de DeskShot desde la bandeja.
 Para quitarlo usa Configuracion de Windows > Aplicaciones > DeskShot.

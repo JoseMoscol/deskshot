@@ -1,20 +1,24 @@
 using System.Globalization;
 using DeskShot.Domain;
+using DeskShot.Application;
 
 namespace DeskShot.Presentation;
 
 public sealed class CaptureChrome(int pixelWidth, int pixelHeight) : FrameworkElement
 {
     public Int32Rect? Region { get; set; }
+    public CaptureTarget? Target { get; set; }
+    public string Hint { get; set; } = "Arrastra para seleccionar · Esc para cancelar";
     protected override void OnRender(DrawingContext dc)
     {
         if (ActualWidth <= 0 || ActualHeight <= 0) return;
         var desktop = new Rect(0, 0, ActualWidth, ActualHeight);
         var dark = new SolidColorBrush(Color.FromArgb(135, 0, 0, 0));
-        if (Region is not { Width: >= 2, Height: >= 2 } region)
+        var shown = Region ?? Target?.Region;
+        if (shown is not { Width: >= 2, Height: >= 2 } region)
         {
             dc.DrawRectangle(dark, null, desktop);
-            Label(dc, "Arrastra para seleccionar · Esc para cancelar", Math.Max(12, (ActualWidth - 370) / 2), 32);
+            Label(dc, Hint, Math.Max(12, (ActualWidth - 570) / 2), 32);
             return;
         }
         double sx = ActualWidth / pixelWidth, sy = ActualHeight / pixelHeight;
@@ -24,12 +28,13 @@ public sealed class CaptureChrome(int pixelWidth, int pixelHeight) : FrameworkEl
         var accent = new SolidColorBrush(Color.FromRgb(120, 231, 195));
         dc.DrawRectangle(null, new Pen(Brushes.Black, 3), selection);
         dc.DrawRectangle(null, new Pen(accent, 1) { DashStyle = DashStyles.Dash }, selection);
-        foreach (var handle in RegionGeometry.Handles(region))
+        if (Region is not null) foreach (var handle in RegionGeometry.Handles(region))
         {
             Point point = new(handle.Point.X * sx, handle.Point.Y * sy);
             dc.DrawRectangle(Brushes.White, new Pen(accent, 1.5), new Rect(point.X - 3.5, point.Y - 3.5, 7, 7));
         }
-        Label(dc, $"{region.Width} × {region.Height} px", selection.Left, selection.Top - 34);
+        Label(dc, Target is not null && Region is null ? $"{Target.Label} · {region.Width} × {region.Height} px · clic para elegir" : $"{region.Width} × {region.Height} px", selection.Left, selection.Top - 34);
+        if (Region is null) Label(dc, Hint, Math.Max(12, (ActualWidth - 650) / 2), ActualHeight - 48);
     }
 
     private void Label(DrawingContext dc, string message, double x, double y)

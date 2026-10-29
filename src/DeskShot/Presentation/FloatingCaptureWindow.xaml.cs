@@ -3,6 +3,8 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Interop;
 using DeskShot.Domain;
 using DeskShot.Infrastructure;
+using DeskShot.Application;
+using System.Windows.Threading;
 
 namespace DeskShot.Presentation;
 
@@ -23,6 +25,15 @@ public partial class FloatingCaptureWindow : Window
     private Int32Rect _startRegion;
     private Point _startPoint;
     private Int32Rect? _previewRegion;
+    private readonly ICaptureTargetDetector? _targets;
+    private readonly DispatcherTimer _hoverTimer = new() { Interval = TimeSpan.FromMilliseconds(140) };
+    private readonly CancellationTokenSource _hoverStop = new();
+    private IReadOnlyList<CaptureTarget> _candidates = [];
+    private CaptureTarget? _hoverTarget, _clickTarget;
+    private Point _hoverPoint;
+    private bool _automatic = true, _windowOnly, _querying, _closed;
+    private int _candidateIndex;
+    public CaptureTarget? HoverTarget => _hoverTarget;
     public CaptureDocument Document { get; }
     public FloatingCaptureAction ResultAction { get; private set; }
     public string CompletionMessage { get; private set; } = "Captura cancelada.";
@@ -30,8 +41,9 @@ public partial class FloatingCaptureWindow : Window
     private static readonly Color[] Palette = [Color.FromRgb(255, 107, 107), Color.FromRgb(120, 231, 195),
         Color.FromRgb(255, 220, 70), Color.FromRgb(87, 166, 255), Colors.White, Colors.Black];
 
-    public FloatingCaptureWindow(App app, DesktopFrame frame, bool selectWholeDesktop = false, bool scrolling = false, bool quickOcr = false)
+    public FloatingCaptureWindow(App app, DesktopFrame frame, bool selectWholeDesktop = false, bool scrolling = false, bool quickOcr = false, ICaptureTargetDetector? targets = null)
     {
+        _targets = targets;
         _quickOcr = quickOcr;
         _app = app;
         _frame = frame;
@@ -49,14 +61,20 @@ public partial class FloatingCaptureWindow : Window
         _surface.Editor.SelectionChanged += (_, _) => RefreshProperties();
         Document.Changed += Document_Changed;
         LostMouseCapture += (_, _) => { if (_regionHandle is not null && !Root.IsMouseCaptured) CancelRegionGesture(); };
+        _hoverTimer.Tick += async (_, _) => await DetectHoverAsync();
         Loaded += (_, _) =>
         {
             var bounds = frame.Bounds;
             if (!NativeMethods.SetWindowPos(new WindowInteropHelper(this).Handle, new nint(-1), bounds.X, bounds.Y, bounds.Width, bounds.Height, 0x0040))
                 throw new InvalidOperationException("No se pudo mostrar el modo de captura flotante.");
             Activate(); Focus(); RefreshRegion();
+            if (_targets is not null && !selectWholeDesktop)
+            {
+                if (NativeMethods.GetCursorPos(out var cursor)) TrackHover(new(cursor.X - frame.Bounds.X, cursor.Y - frame.Bounds.Y));
+                _hoverTimer.Start();
+            }
         };
-        Closed += (_, _) => { Document.Changed -= Document_Changed; ExtraOptions.Dispose(); _surface.Editor.Dispose(); };
+        Closed += (_, _) => { _closed = true; _hoverTimer.Stop(); _hoverStop.Cancel(); if (!_querying) _hoverStop.Dispose(); Document.Changed -= Document_Changed; ExtraOptions.Dispose(); _surface.Editor.Dispose(); };
         if (selectWholeDesktop) SelectRegion(new Int32Rect(0, 0, Document.Width, Document.Height));
         RefreshToolButtons(); RefreshProperties();
     }
@@ -64,6 +82,7 @@ public partial class FloatingCaptureWindow : Window
     public void SelectRegion(Int32Rect region)
     {
         _hasSelection = true;
+        _hoverTarget = null; _candidates = [];
         Document.SetRegion(region);
         RefreshRegion();
     }
@@ -80,6 +99,10 @@ public partial class FloatingCaptureWindow : Window
         if (Root is null) return;
         var region = CurrentRegion;
         _chrome.Region = _hasSelection || _regionHandle is not null ? region : null;
+        _chrome.Target = !_hasSelection && _regionHandle is null ? _hoverTarget : null;
+        _chrome.Hint = _targets is null ? "Arrastra para seleccionar · Esc para cancelar" : !_automatic ? "Selección manual · arrastra para elegir · M automática · Esc cancela"
+            : _windowOnly ? "Ventanas · clic para elegir · W paneles · M manual · arrastra para recortar"
+            : "Clic para elegir área · Tab cambia el nivel · W ventana · M manual · arrastra para recortar";
         _chrome.InvalidateVisual();
         _surface.InteractionBounds = _hasSelection ? new Rect(region.X, region.Y, region.Width, region.Height) : null;
         bool show = _hasSelection && _regionHandle is null && !_quickOcr;
@@ -94,6 +117,50 @@ public partial class FloatingCaptureWindow : Window
         var placement = FloatingToolbarLayout.Place(ToView(region), viewport, ToolsPanel.DesiredSize, ActionsPanel.DesiredSize);
         Canvas.SetLeft(ToolsPanel, placement.Tools.X); Canvas.SetTop(ToolsPanel, placement.Tools.Y);
         Canvas.SetLeft(ActionsPanel, placement.Actions.X); Canvas.SetTop(ActionsPanel, placement.Actions.Y);
+    }
+
+    internal void TrackHover(Point point)
+    {
+        _hoverPoint = point;
+        if (_closed || _targets is null || !_automatic || _hasSelection || _regionHandle is not null) return;
+        var window = _targets.WindowAt(point);
+        if (_windowOnly || _hoverTarget is null || window?.WindowId != _hoverTarget.WindowId || !CaptureTargetGeometry.Contains(_hoverTarget.Region, point))
+        { _hoverTarget = window; _candidates = window is null ? [] : [window]; _candidateIndex = 0; }
+        RefreshRegion();
+    }
+    internal async Task DetectHoverAsync()
+    {
+        if (_closed || _querying || _targets is null || !_automatic || _windowOnly || _hasSelection || _regionHandle is not null) return;
+        _querying = true; var point = _hoverPoint;
+        try
+        {
+            var found = await _targets.QueryAsync(point, _hoverStop.Token);
+            if (_closed || !_automatic || _windowOnly || _hasSelection || _regionHandle is not null || (_hoverPoint - point).Length > 3) return;
+            var ordered = CaptureTargetGeometry.Order(found, point);
+            if (ordered.Count == 0) return;
+            bool same = _candidates.Select(c => c.Region).SequenceEqual(ordered.Select(c => c.Region));
+            _candidates = ordered; _candidateIndex = same ? Math.Min(_candidateIndex, ordered.Count - 1) : 0;
+            _hoverTarget = _candidates[_candidateIndex]; RefreshRegion();
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex) when (ex is not OutOfMemoryException) { /* La selección manual sigue disponible. */ }
+        finally { _querying = false; if (_closed) _hoverStop.Dispose(); }
+    }
+    internal void CycleTarget()
+    {
+        if (_hasSelection || _candidates.Count == 0) return;
+        _candidateIndex = (_candidateIndex + 1) % _candidates.Count;
+        _hoverTarget = _candidates[_candidateIndex]; RefreshRegion();
+    }
+    internal void ToggleAutomatic()
+    {
+        _automatic = !_automatic; _hoverTarget = null; _candidates = [];
+        TrackHover(_hoverPoint); RefreshRegion();
+    }
+    internal void ToggleWindowOnly()
+    {
+        _windowOnly = !_windowOnly; _automatic = true; _hoverTarget = null; _candidates = [];
+        TrackHover(_hoverPoint); RefreshRegion();
     }
 
     private Rect ToolbarViewport(Int32Rect region)
@@ -132,6 +199,7 @@ public partial class FloatingCaptureWindow : Window
     {
         if (_busy || IsControl(e.OriginalSource as DependencyObject)) return;
         Point point = Pointer(e);
+        _clickTarget = !_hasSelection && _automatic && _hoverTarget is { } target && CaptureTargetGeometry.Contains(target.Region, point) ? target : null;
         RegionHandle? handle = _hasSelection ? RegionGeometry.HitHandle(Document.Region, point, 6 / ScaleX) : RegionHandle.New;
         var region = Document.Region;
         bool inside = new Rect(region.X, region.Y, region.Width, region.Height).Contains(point);
@@ -163,7 +231,7 @@ public partial class FloatingCaptureWindow : Window
             return;
         }
         if (_busy || IsControl(e.OriginalSource as DependencyObject)) return;
-        if (!_hasSelection) { Cursor = Cursors.Cross; return; }
+        if (!_hasSelection) { Cursor = Cursors.Cross; TrackHover(Pointer(e)); return; }
         var hit = RegionGeometry.HitHandle(Document.Region, Pointer(e), 6 / ScaleX);
         Cursor = hit switch
         {
@@ -180,6 +248,8 @@ public partial class FloatingCaptureWindow : Window
     {
         if (_regionHandle is not { } handle) return;
         var region = RegionGeometry.Adjust(_startRegion, handle, _startPoint, Pointer(e), Document.Width, Document.Height);
+        if (handle == RegionHandle.New && !_hasSelection && _clickTarget is { } target && CaptureTargetGeometry.IsClick(_startPoint, Pointer(e), 1 / Math.Max(.001, ScaleX))) region = target.Region;
+        _clickTarget = null;
         _regionHandle = null; _previewRegion = null;
         Root.ReleaseMouseCapture();
         if (region.Width >= 2 && region.Height >= 2) SelectRegion(region);
@@ -391,6 +461,12 @@ public partial class FloatingCaptureWindow : Window
     }
     private async void Window_PreviewKeyDown(object sender, KeyEventArgs e)
     {
+        if (!_hasSelection && _regionHandle is null && _targets is not null && Keyboard.Modifiers == ModifierKeys.None)
+        {
+            if (e.Key == Key.Tab) { CycleTarget(); e.Handled = true; return; }
+            if (e.Key == Key.W) { ToggleWindowOnly(); e.Handled = true; return; }
+            if (e.Key == Key.M) { ToggleAutomatic(); e.Handled = true; return; }
+        }
         if (_quickOcr)
         {
             if (e.Key == Key.Escape) Close();
