@@ -4,18 +4,19 @@ Set-Location -LiteralPath $PSScriptRoot
 $installerPath = (Resolve-Path -LiteralPath $Installer).Path
 $registryPath = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\DeskShot_is1'
 if (Test-Path -LiteralPath $registryPath) { throw 'Ya hay una instalacion registrada de DeskShot. No se modifica para hacer esta prueba.' }
+$shortcutFolder = Join-Path ([Environment]::GetFolderPath('Programs')) 'DeskShot'
+# Inno ignora /GROUP cuando DisableProgramGroupPage=yes: no utilizar accesos existentes.
+if (Test-Path -LiteralPath $shortcutFolder) { throw 'Ya existe el grupo de Inicio DeskShot. No se modifica para hacer esta prueba.' }
+if (Test-Path -LiteralPath (Join-Path $env:LOCALAPPDATA 'Programs/DeskShot')) { throw 'Ya existe una carpeta de DeskShot instalada. No se utiliza para hacer esta prueba.' }
 $runtimeVersion = (Get-Item -LiteralPath (Join-Path $env:WINDIR 'System32/vcruntime140.dll')).VersionInfo
 if ($runtimeVersion.FileMajorPart -lt 14 -or ($runtimeVersion.FileMajorPart -eq 14 -and $runtimeVersion.FileMinorPart -lt 29)) { throw 'Esta prueba requiere Visual C++ instalado; no ejecuta instalaciones elevadas del runtime.' }
 $testId = [Guid]::NewGuid().ToString('N')
 $verificationRoot = Join-Path $PSScriptRoot "artifacts/installer-verification/$testId"
 $installationPath = Join-Path $verificationRoot 'Installed'
 New-Item -ItemType Directory -Path $verificationRoot -Force | Out-Null
-$groupName = 'DeskShot verification ' + $testId
-$shortcutFolder = Join-Path ([Environment]::GetFolderPath('Programs')) $groupName
-if (Test-Path -LiteralPath $shortcutFolder) { throw 'Ya existe el grupo de Inicio de prueba. No se utiliza.' }
 $settingsPath = Join-Path $env:LOCALAPPDATA 'DeskShot/settings.json'
 $settingsHash = if (Test-Path -LiteralPath $settingsPath) { (Get-FileHash -LiteralPath $settingsPath).Hash } else { $null }
-$arguments = @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', '/TASKS=', ('/GROUP="' + $groupName + '"'), ('/DIR="' + $installationPath + '"'))
+$arguments = @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/SP-', '/TASKS=', ('/DIR="' + $installationPath + '"'))
 function Invoke-TestSetup([string]$LogName) {
     $runArguments = $arguments + ('/LOG="' + (Join-Path $verificationRoot $LogName) + '"')
     $run = Start-Process -FilePath $installerPath -ArgumentList $runArguments -WindowStyle Hidden -Wait -PassThru
