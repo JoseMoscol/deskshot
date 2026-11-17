@@ -14,6 +14,7 @@ public partial class MainWindow : Window
     {
         _app = app;
         InitializeComponent();
+        VersionText.Text = $"Versión {App.CurrentVersion.ToString(3)}";
         LoadSettings();
         Closing += OnClosing;
     }
@@ -35,8 +36,10 @@ public partial class MainWindow : Window
     {
         HomePanel.Visibility = settings ? Visibility.Collapsed : Visibility.Visible;
         SettingsPanel.Visibility = settings ? Visibility.Visible : Visibility.Collapsed;
-        HomeNav.Background = new SolidColorBrush(settings ? Colors.Transparent : Color.FromRgb(38, 56, 74));
-        SettingsNav.Background = new SolidColorBrush(settings ? Color.FromRgb(38, 56, 74) : Colors.Transparent);
+        HomeNav.Tag = settings ? null : "Active";
+        SettingsNav.Tag = settings ? "Active" : null;
+        SavePreferencesButton.Visibility = settings ? Visibility.Visible : Visibility.Collapsed;
+        PageScroll.ScrollToTop();
     }
 
     private async void CaptureRegion_Click(object sender, RoutedEventArgs e) => await _app.CaptureAsync(true);
@@ -85,13 +88,29 @@ public partial class MainWindow : Window
         if (QualityBox is not null) QualityBox.IsEnabled = FormatBox.SelectedIndex == 1;
     }
 
+    private void AppearanceBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (AppearanceBox.SelectedValue is not AppAppearance appearance || appearance == _app.Settings.Appearance) return;
+        try
+        {
+            _app.SetAppearance(appearance);
+            SetStatus("Apariencia guardada.");
+        }
+        catch (Exception ex)
+        {
+            AppearanceBox.SelectedValue = _app.Settings.Appearance;
+            SetStatus("No se pudo cambiar la apariencia. " + ex.Message);
+        }
+    }
+
     private void LoadSettings()
     {
         var settings = _app.Settings;
+        AppearanceBox.SelectedValue = settings.Appearance;
         _pendingShortcut = settings.Shortcut;
         _pendingOcrShortcut = settings.OcrShortcut;
         OcrShortcutBox.Text = settings.OcrShortcut.ToString();
-        OcrShortcutSummary.Text = settings.OcrShortcut + " · motor local de español e inglés";
+        OcrShortcutSummary.Text = "Extrae texto localmente. " + settings.OcrShortcut;
         ShortcutBox.Text = settings.Shortcut.ToString();
         ShortcutSummary.Text = settings.Shortcut.ToString();
         FolderBox.Text = settings.SaveFolder;
@@ -103,7 +122,7 @@ public partial class MainWindow : Window
         AutoSaveBox.IsChecked = settings.AutoSave;
         TrayBox.IsChecked = settings.MinimizeToTray;
         UpdateCheckBox.IsChecked = settings.CheckUpdatesOnStartup;
-        FormatSummary.Text = settings.Format == ImageFileFormat.Png ? "PNG · sin pérdida" : $"JPG · calidad {settings.JpegQuality}";
+        FormatSummary.Text = settings.Format == ImageFileFormat.Png ? "Formato de salida · PNG sin pérdida" : $"Formato de salida · JPG, calidad {settings.JpegQuality}";
     }
 
     private void SaveSettings_Click(object sender, RoutedEventArgs e)
@@ -112,21 +131,22 @@ public partial class MainWindow : Window
         {
             if (!int.TryParse(QualityBox.Text, out int quality)) throw new ArgumentException("Introduce una calidad JPG entre 1 y 100.");
             if (!int.TryParse(DelayBox.Text, out int delay)) throw new ArgumentException("Introduce una espera entre 0 y 10 segundos.");
-            var settings = new AppSettings
+            var settings = _app.Settings with
             {
                 Shortcut = _pendingShortcut, OcrShortcut = _pendingOcrShortcut, SaveFolder = FolderBox.Text.Trim(),
                 Format = FormatBox.SelectedIndex == 0 ? ImageFileFormat.Png : ImageFileFormat.Jpeg,
                 JpegQuality = quality, CaptureDelaySeconds = delay,
                 CopyAfterCapture = CopyBox.IsChecked == true, AutoSave = AutoSaveBox.IsChecked == true,
                 MinimizeToTray = TrayBox.IsChecked == true, CheckUpdatesOnStartup = UpdateCheckBox.IsChecked == true
-            }.Validate();
+            };
+            settings.Validate();
             // Comprobar escritura antes de registrar o persistir cambios.
             Directory.CreateDirectory(settings.SaveFolder);
             string probe = Path.Combine(settings.SaveFolder, ".deskshot-" + Guid.NewGuid().ToString("N") + ".tmp");
             using (new FileStream(probe, FileMode.CreateNew, FileAccess.Write, FileShare.None, 1, FileOptions.DeleteOnClose)) { }
             _app.ApplySettings(settings);
             LoadSettings();
-            SetStatus("Configuración guardada. El atajo ya está activo.");
+            SetStatus("Configuración guardada.");
         }
         catch (Exception ex) { SetStatus(ex.Message); }
     }

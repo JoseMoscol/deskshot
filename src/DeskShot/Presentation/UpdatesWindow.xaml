@@ -7,18 +7,18 @@
  <Grid Margin="26">
   <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
   <StackPanel>
-   <TextBlock Text="DESKSHOT AL DÍA" Foreground="{StaticResource AccentBrush}" FontSize="11" />
+   <TextBlock Text="DESKSHOT AL DÍA" Foreground="{DynamicResource AccentBrush}" FontSize="11" />
    <TextBlock Text="Actualizaciones" FontSize="28" FontWeight="SemiBold" Margin="0,8,0,10" />
-   <TextBlock x:Name="VersionText" Foreground="{StaticResource MutedBrush}" />
+   <TextBlock x:Name="VersionText" Foreground="{DynamicResource MutedBrush}" />
   </StackPanel>
   <TextBlock x:Name="StatusText" Grid.Row="1" Text="Pulsa Buscar actualizaciones para consultar GitHub." Margin="0,18,0,14" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
   <TextBox x:Name="NotesBox" Grid.Row="2" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap" VerticalContentAlignment="Top" VerticalScrollBarVisibility="Auto" Text="Aquí aparecerán las novedades de la versión disponible." AutomationProperties.Name="Novedades de la actualización" />
   <StackPanel Grid.Row="3" Margin="0,14,0,14">
    <ProgressBar x:Name="DownloadProgress" Height="7" Maximum="100" Visibility="Collapsed" />
-   <TextBlock x:Name="DownloadText" FontSize="12" Foreground="{StaticResource AccentBrush}" Margin="0,7,0,4" />
-   <TextBlock x:Name="PrivacyText" Text="Solo esta función consulta GitHub. Tus capturas y el texto del OCR no se envían. La descarga y la instalación requieren tu acción." Foreground="{StaticResource MutedBrush}" FontSize="12" TextWrapping="Wrap" />
-   <TextBlock x:Name="PortableText" Text="Estás usando una copia portable o de desarrollo. Esta opción instalará la edición normal con acceso en Inicio." Visibility="Collapsed" Foreground="{StaticResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,9,0,0" />
-   <TextBlock Text="Al instalar se cerrará DeskShot. Guarda o copia las referencias ancladas que quieras conservar; los editores resolverán sus cambios pendientes." Foreground="{StaticResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,9,0,0" />
+   <TextBlock x:Name="DownloadText" FontSize="12" Foreground="{DynamicResource AccentBrush}" Margin="0,7,0,4" />
+   <TextBlock x:Name="PrivacyText" Text="Solo esta función consulta GitHub. Tus capturas y el texto del OCR no se envían. La descarga y la instalación requieren tu acción." Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" />
+   <TextBlock x:Name="PortableText" Text="Estás usando una copia portable o de desarrollo. Esta opción instalará la edición normal con acceso en Inicio." Visibility="Collapsed" Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,9,0,0" />
+   <TextBlock Text="Al instalar se cerrará DeskShot. Guarda o copia las referencias ancladas que quieras conservar; los editores resolverán sus cambios pendientes." Foreground="{DynamicResource MutedBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,9,0,0" />
   </StackPanel>
   <WrapPanel Grid.Row="4" HorizontalAlignment="Right">
    <Button x:Name="CancelButton" Content="Cancelar" Click="Cancel_Click" Visibility="Collapsed" Margin="0,0,8,6" />

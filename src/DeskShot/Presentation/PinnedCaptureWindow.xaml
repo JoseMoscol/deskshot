@@ -5,14 +5,14 @@
  WindowStyle="None" ResizeMode="CanResizeWithGrip" Topmost="True" ShowInTaskbar="False"
  Width="660" Height="470" MinWidth="360" MinHeight="180" WindowStartupLocation="CenterScreen"
  PreviewKeyDown="Window_KeyDown">
- <Border BorderBrush="#78E7C3" BorderThickness="1" Background="#0E131B">
+ <Border BorderBrush="{DynamicResource AccentBorderBrush}" BorderThickness="1" Background="{DynamicResource BackgroundBrush}">
   <Grid>
    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-   <Border Background="#17212E" Padding="9" MouseLeftButtonDown="Header_MouseDown">
+   <Border Background="{DynamicResource SurfaceBrush}" Padding="9" MouseLeftButtonDown="Header_MouseDown">
     <StackPanel>
      <DockPanel Margin="0,0,0,7">
       <Button DockPanel.Dock="Right" Content="×" Click="Close_Click" Padding="11,2" AutomationProperties.Name="Cerrar captura anclada" />
-      <TextBlock Text="CAPTURA ANCLADA · arrastra esta barra" Foreground="{StaticResource AccentBrush}" FontSize="11" VerticalAlignment="Center" Margin="2,0,10,0" />
+      <TextBlock Text="CAPTURA ANCLADA · arrastra esta barra" Foreground="{DynamicResource AccentBrush}" FontSize="11" VerticalAlignment="Center" Margin="2,0,10,0" />
      </DockPanel>
      <WrapPanel>
       <Button Content="Copiar" Click="Copy_Click" Padding="11,7" Margin="0,0,6,4" ToolTip="Copiar imagen completa, sin reducirla (Ctrl+C)" />
@@ -26,10 +26,10 @@
      </WrapPanel>
     </StackPanel>
    </Border>
-   <ScrollViewer x:Name="ImageViewer" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" SizeChanged="Viewer_SizeChanged" Background="#080C12">
+   <ScrollViewer x:Name="ImageViewer" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" SizeChanged="Viewer_SizeChanged" Background="{DynamicResource CanvasBrush}">
     <Image x:Name="PinnedImage" Stretch="Fill" HorizontalAlignment="Center" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality" />
    </ScrollViewer>
-   <TextBlock x:Name="StatusText" Grid.Row="2" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="10,7" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+   <TextBlock x:Name="StatusText" Grid.Row="2" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="10,7" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
   </Grid>
  </Border>
 </Window>

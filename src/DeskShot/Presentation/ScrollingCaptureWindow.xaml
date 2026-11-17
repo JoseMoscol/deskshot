@@ -5,7 +5,7 @@
  Width="540" SizeToContent="Height" MaxHeight="{x:Static SystemParameters.PrimaryScreenHeight}" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
  Topmost="True" Closing="Window_Closing" PreviewKeyDown="Window_KeyDown">
  <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="26">
-  <TextBlock Text="PÁGINAS Y DOCUMENTOS" Foreground="{StaticResource AccentBrush}" FontSize="11" />
+  <TextBlock Text="PÁGINAS Y DOCUMENTOS" Foreground="{DynamicResource AccentBrush}" FontSize="11" />
   <TextBlock x:Name="Heading" Text="Captura con desplazamiento" FontSize="24" FontWeight="SemiBold" Margin="0,9,0,12" TextWrapping="Wrap" />
   <StackPanel x:Name="SetupPanel">
    <TextBlock Text="Coloca el documento al inicio antes de seleccionar el área. Se capturará desde su posición actual hacia abajo." Style="{StaticResource MutedText}" />
@@ -19,7 +19,7 @@
    <ComboBox x:Name="WaitBox" SelectedIndex="0" AutomationProperties.Name="Espera del desplazamiento"><ComboBoxItem Content="Normal · 0,6 segundos" /><ComboBoxItem Content="Contenido lento · 1,5 segundos" /><ComboBoxItem Content="Contenido muy lento · 3 segundos" /></ComboBox>
    <TextBlock Text="No uses el ratón ni cambies de ventana durante la captura. Esc termina y conserva lo capturado. PNG mantiene todos los píxeles; JPG comprime con pérdida." Style="{StaticResource MutedText}" FontSize="12" Margin="0,15,0,14" />
   </StackPanel>
-  <TextBlock x:Name="ProgressText" TextWrapping="Wrap" Foreground="{StaticResource AccentBrush}" Margin="0,0,0,15" AutomationProperties.LiveSetting="Polite" />
+  <TextBlock x:Name="ProgressText" TextWrapping="Wrap" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,15" AutomationProperties.LiveSetting="Polite" />
   <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
    <Button x:Name="CancelButton" Content="Cancelar" Click="Cancel_Click" Margin="0,0,8,0" />
    <Button x:Name="StartButton" Content="Iniciar captura" Style="{StaticResource AccentButton}" Click="Start_Click" />

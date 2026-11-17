@@ -1,6 +1,7 @@
 namespace DeskShot.Domain;
 
 public enum ImageFileFormat { Png, Jpeg }
+public enum AppAppearance { System, Light, Dark }
 
 public sealed record ShortcutSettings(ModifierKeys Modifiers, Key Key)
 {
@@ -34,6 +35,7 @@ public sealed record AppSettings
     public bool MinimizeToTray { get; init; } = true;
     public int CaptureDelaySeconds { get; init; }
     public bool CheckUpdatesOnStartup { get; init; }
+    public AppAppearance Appearance { get; init; } = AppAppearance.System;
 
     public AppSettings Validate()
     {
@@ -41,6 +43,7 @@ public sealed record AppSettings
             throw new ArgumentException("Selecciona una carpeta de destino con una ruta absoluta.");
         _ = Path.GetFullPath(SaveFolder);
         if (!Enum.IsDefined(Format)) throw new ArgumentException("El formato de imagen no es válido.");
+        if (!Enum.IsDefined(Appearance)) throw new ArgumentException("La apariencia no es válida.");
         if (JpegQuality is < 1 or > 100) throw new ArgumentException("La calidad JPG debe estar entre 1 y 100.");
         if (Shortcut is null || !Shortcut.IsValid) throw new ArgumentException("Usa Ctrl, Alt, Shift o Win junto con una letra, número o tecla F.");
         if (OcrShortcut is null || !OcrShortcut.IsValid) throw new ArgumentException("El atajo de OCR debe combinar Ctrl, Alt, Shift o Win con una letra, número o tecla F.");

@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text.Json.Nodes;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -21,7 +22,8 @@ internal static partial class Program
     {
         _output = Path.GetFullPath(args.FirstOrDefault(a => !a.StartsWith("--")) ?? "artifacts/verification");
         Directory.CreateDirectory(_output);
-        var app = new App(verificationMode: true);
+        var appearanceStore = new JsonSettingsStore(Path.Combine(_output, "appearance-test.json"));
+        var app = new App(verificationMode: true, settingsStore: appearanceStore);
         app.InitializeComponent();
         if (args.Contains("--target-document")) return ShowTargetDocument(app);
         if (args.Contains("--target-selector")) return ShowTargetSelector(app);
@@ -48,7 +50,7 @@ internal static partial class Program
         Run("Atajos válidos y formato legible", TestShortcuts);
         if (!args.Contains("--skip-hotkeys")) Run("Atajo ocupado conserva el registro anterior", TestHotkeys);
         else Console.WriteLine("SKIP Registro global de atajos (entorno restringido)");
-        Run("Interfaz principal, configuración y editor renderizables", () => RenderPreviews(app));
+        Run("Interfaz principal, configuración y editor en claro y oscuro", () => RenderPreviews(app, appearanceStore));
         Run("OCR local bilingüe: acentos, números y líneas", TestOcrBilingual);
         Run("OCR local: texto blanco en fondo oscuro", TestOcrDark);
         Run("OCR local: imagen sin texto", TestOcrBlank);
@@ -233,12 +235,17 @@ internal static partial class Program
         var settings = new AppSettings
         {
             SaveFolder = _output, Format = ImageFileFormat.Jpeg, JpegQuality = 88, CaptureDelaySeconds = 3,
-            AutoSave = true, CopyAfterCapture = false, CheckUpdatesOnStartup = true, Shortcut = new(ModifierKeys.Control | ModifierKeys.Alt, Key.F8)
+            AutoSave = true, CopyAfterCapture = false, CheckUpdatesOnStartup = true, Shortcut = new(ModifierKeys.Control | ModifierKeys.Alt, Key.F8),
+            Appearance = AppAppearance.Dark
         };
         store.Save(settings);
         Check(store.Load() == settings, "La configuración no persiste correctamente.");
         Throws<ArgumentException>(() => store.Save(settings with { JpegQuality = 101 }));
         Check(store.Load() == settings, "Un valor inválido dañó la configuración anterior.");
+        var legacySettings = JsonNode.Parse(File.ReadAllText(path))!.AsObject();
+        legacySettings.Remove(nameof(AppSettings.Appearance));
+        File.WriteAllText(path, legacySettings.ToJsonString());
+        Check(store.Load() == (settings with { Appearance = AppAppearance.System }), "Las preferencias anteriores no adoptan la apariencia del sistema.");
         File.WriteAllText(path, "JSON roto");
         Check(store.Load().Format == ImageFileFormat.Png && store.LoadWarning is not null, "No se recuperó la configuración inválida.");
         Check(File.ReadAllText(path) == "JSON roto", "Se sobrescribió el JSON inválido sin pedir guardar.");
@@ -270,14 +277,26 @@ internal static partial class Program
         first.Register(previous);
     }
 
-    private static void RenderPreviews(App app)
+    private static void RenderPreviews(App app, JsonSettingsStore store)
     {
         var main = new MainWindow(app);
-        Check(main.Foreground is SolidColorBrush { Color: var foreground } && foreground == Color.FromRgb(241, 245, 250), "El tema oscuro no aplica el color legible de texto.");
+        var appearance = (ComboBox)main.FindName("AppearanceBox");
+        var settings = app.Settings;
+        appearance.SelectedValue = AppAppearance.Dark;
+        var darkBackground = ((SolidColorBrush)main.Background).Color;
+        Check(darkBackground.R < 40, "La ventana no adoptó el fondo oscuro.");
         RenderContent(main, 1064, 741, "home.png");
-        ((FrameworkElement)main.FindName("HomePanel")).Visibility = Visibility.Collapsed;
-        ((FrameworkElement)main.FindName("SettingsPanel")).Visibility = Visibility.Visible;
+        ((Button)main.FindName("SettingsNav")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         RenderContent(main, 1064, 741, "settings.png");
+        appearance.SelectedValue = AppAppearance.Light;
+        var lightBackground = ((SolidColorBrush)main.Background).Color;
+        Check(lightBackground.R > 220 && ((SolidColorBrush)main.Foreground).Color.R < 60, "La ventana abierta no adoptó la paleta clara.");
+        Check(store.Load() == (settings with { Appearance = AppAppearance.Light }), "Cambiar de apariencia alteró otras preferencias.");
+        RenderContent(main, 1064, 741, "settings-light.png");
+        ((Button)main.FindName("HomeNav")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        RenderContent(main, 1064, 741, "home-light.png");
+        appearance.SelectedValue = AppAppearance.Dark;
+        Check(((SolidColorBrush)main.Background).Color == darkBackground, "La ventana abierta no recuperó la paleta oscura.");
         var document = new CaptureDocument(DemoImage());
         document.Add(new Annotation(AnnotationTool.Rectangle, Color.FromRgb(255, 107, 107), 5, new[] { new Point(90, 230), new Point(650, 440) }));
         document.Add(new Annotation(AnnotationTool.Arrow, Color.FromRgb(120, 231, 195), 5, new[] { new Point(1100, 600), new Point(730, 370) }));
@@ -319,7 +338,7 @@ internal static partial class Program
     private static void RenderContent(Window window, int width, int height, string file)
     {
         var content = (FrameworkElement)window.Content;
-        if (content is Panel panel) panel.Background = new SolidColorBrush(Color.FromRgb(14, 19, 27));
+        if (content is Panel panel) panel.Background = window.Background;
         content.Measure(new Size(width, height));
         content.Arrange(new Rect(0, 0, width, height));
         content.UpdateLayout();

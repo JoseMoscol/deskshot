@@ -292,8 +292,16 @@ public partial class FloatingCaptureWindow : Window
         var buttons = new[] { SelectButton, PenButton, ArrowButton, RectangleButton, HighlightButton, TextButton, RedactButton, PixelateButton, BlurButton, StepButton };
         void Style(Button button, bool active)
         {
-            button.Background = active ? new SolidColorBrush(Color.FromRgb(120, 231, 195)) : Brushes.Transparent;
-            button.Foreground = active ? new SolidColorBrush(Color.FromRgb(10, 41, 33)) : Brushes.White;
+            if (active)
+            {
+                button.SetResourceReference(BackgroundProperty, "AccentFillBrush");
+                button.SetResourceReference(ForegroundProperty, "AccentTextBrush");
+            }
+            else
+            {
+                button.ClearValue(BackgroundProperty);
+                button.ClearValue(ForegroundProperty);
+            }
         }
         Style(AreaButton, _areaMode);
         for (int i = 0; i < buttons.Length; i++) Style(buttons[i], !_areaMode && (int)_surface.Tool == i);

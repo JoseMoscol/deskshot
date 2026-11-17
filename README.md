@@ -45,6 +45,7 @@ Las barras se colocan junto a la región y cambian de lado o entran en el área 
 
 En **Configuración** puedes elegir:
 
+- Apariencia **Sistema**, **Claro** u **Oscuro**. Se aplica al instante y se recuerda al volver a abrir DeskShot.
 - Atajo global: haz clic en el campo, pulsa la combinación y guarda. Si está ocupada, se conserva el registro anterior.
 - Carpeta de destino y formato predeterminado: **PNG sin pérdida** o **JPG con calidad 1–100** (95 inicialmente).
 - Espera de 0 a 10 segundos antes de capturar.

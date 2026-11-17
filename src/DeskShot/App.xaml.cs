@@ -5,6 +5,7 @@ using DeskShot.Application;
 using DeskShot.Domain;
 using DeskShot.Infrastructure;
 using DeskShot.Presentation;
+using Microsoft.Win32;
 using Forms = System.Windows.Forms;
 
 namespace DeskShot;
@@ -12,9 +13,13 @@ namespace DeskShot;
 public partial class App : System.Windows.Application
 {
     private readonly bool _verificationMode;
-    public App() { }
-    internal App(bool verificationMode) => _verificationMode = verificationMode;
-    private readonly JsonSettingsStore _settingsStore = new();
+    private readonly JsonSettingsStore _settingsStore;
+    public App() : this(false) { }
+    internal App(bool verificationMode, JsonSettingsStore? settingsStore = null)
+    {
+        _verificationMode = verificationMode;
+        _settingsStore = settingsStore ?? new JsonSettingsStore();
+    }
     private readonly ICaptureService _captureService = new GdiCaptureService();
     private CaptureHotkeys? _hotkeys;
     private Forms.NotifyIcon? _tray;
@@ -28,6 +33,7 @@ public partial class App : System.Windows.Application
     private PdfExportWindow? _pdfWindow;
     private readonly CancellationTokenSource _lifetime = new();
     private bool _trayHintShown;
+    private ResourceDictionary? _lightPalette;
     public bool IsExiting { get; private set; }
     public AppSettings Settings { get; private set; } = new();
     public IImageExporter Exporter { get; } = new ImageExporter();
@@ -52,6 +58,8 @@ public partial class App : System.Windows.Application
         // una instancia que pueda tener capturas pendientes en el editor.
         _installerGuard = new Mutex(false, "Local\\DeskShotInstallerGuard");
         Settings = _settingsStore.Load();
+        ApplyAppearance();
+        SystemEvents.UserPreferenceChanged += SystemAppearanceChanged;
         Dashboard = new MainWindow(this);
         MainWindow = Dashboard;
         Dashboard.SourceInitialized += (_, _) =>
@@ -103,7 +111,53 @@ public partial class App : System.Windows.Application
         settings.Validate();
         if (_hotkeys is not null) _hotkeys.Apply(settings.Shortcut, settings.OcrShortcut, () => _settingsStore.Save(settings));
         else _settingsStore.Save(settings);
+        bool appearanceChanged = Settings.Appearance != settings.Appearance;
         Settings = settings;
+        if (appearanceChanged) ApplyAppearance();
+    }
+
+    internal void SetAppearance(AppAppearance appearance)
+    {
+        if (Settings.Appearance == appearance) return;
+        var settings = Settings with { Appearance = appearance };
+        _settingsStore.Save(settings);
+        Settings = settings;
+        ApplyAppearance();
+    }
+
+    private void SystemAppearanceChanged(object sender, UserPreferenceChangedEventArgs e)
+    {
+        _ = Dispatcher.InvokeAsync(() =>
+        {
+            if (!IsExiting && Settings.Appearance == AppAppearance.System) ApplyAppearance();
+        });
+    }
+
+    private void ApplyAppearance()
+    {
+        bool light = Settings.Appearance switch
+        {
+            AppAppearance.Light => true,
+            AppAppearance.Dark => false,
+            _ => Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize",
+                "AppsUseLightTheme", 1) is not 0
+        };
+
+#pragma warning disable WPF0001 // Use WPF's Fluent theme for native controls and the window frame.
+        var mode = light ? System.Windows.ThemeMode.Light : System.Windows.ThemeMode.Dark;
+        if (ThemeMode != mode) ThemeMode = mode;
+#pragma warning restore WPF0001
+
+        if (light && _lightPalette is null)
+        {
+            _lightPalette = new ResourceDictionary { Source = new Uri("/DeskShot;component/Presentation/Themes/Light.xaml", UriKind.Relative) };
+            Resources.MergedDictionaries.Add(_lightPalette);
+        }
+        else if (!light && _lightPalette is not null)
+        {
+            Resources.MergedDictionaries.Remove(_lightPalette);
+            _lightPalette = null;
+        }
     }
 
     public async Task CaptureAsync(bool region, bool scrolling = false, bool quickOcr = false)
@@ -297,6 +351,7 @@ public partial class App : System.Windows.Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        SystemEvents.UserPreferenceChanged -= SystemAppearanceChanged;
         _lifetime.Cancel();
         _hotkeys?.Dispose();
         if (_tray is not null) { _tray.Visible = false; _tray.ContextMenuStrip?.Dispose(); _tray.Dispose(); }

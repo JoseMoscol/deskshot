@@ -8,56 +8,57 @@
  <Window.Resources>
   <Style x:Key="FloatingTool" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
    <Setter Property="Width" Value="36" /><Setter Property="Height" Value="32" /><Setter Property="Padding" Value="0" />
-   <Setter Property="FontSize" Value="20" /><Setter Property="Margin" Value="0,2" />
-   <Setter Property="Background" Value="Transparent" /><Setter Property="BorderThickness" Value="0" />
+   <Setter Property="Margin" Value="0,2" />
+   <Setter Property="Background" Value="Transparent" /><Setter Property="BorderBrush" Value="Transparent" />
   </Style>
  </Window.Resources>
  <Grid x:Name="Root" Background="Transparent" ClipToBounds="True" Focusable="True" PreviewMouseLeftButtonDown="Root_MouseDown" MouseMove="Root_MouseMove" MouseLeftButtonUp="Root_MouseUp" SizeChanged="Root_SizeChanged">
   <Grid x:Name="SurfaceHost" />
   <Grid x:Name="ChromeHost" IsHitTestVisible="False" />
   <Canvas x:Name="BarLayer">
-   <Border x:Name="ToolsPanel" Visibility="Collapsed" Background="#F5171F2B" BorderBrush="#536275" BorderThickness="1" CornerRadius="9" Padding="6">
+   <Border x:Name="ToolsPanel" Visibility="Collapsed" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="9" Padding="6">
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
      <StackPanel>
-      <Button x:Name="AreaButton" Content="▣" Style="{StaticResource FloatingTool}" Click="Area_Click" ToolTip="Ajustar área (B). Arrastra sus bordes o el fondo para moverla." AutomationProperties.Name="Ajustar área" />
-      <Border BorderBrush="#3A4759" BorderThickness="0,1,0,0" Margin="2,5" />
-      <Button x:Name="SelectButton" Content="↖" Tag="0" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Seleccionar y mover anotaciones (V)" AutomationProperties.Name="Seleccionar anotaciones" />
-      <Button x:Name="PenButton" Content="✎" Tag="1" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Lápiz (P)" AutomationProperties.Name="Lápiz" />
-      <Button x:Name="ArrowButton" Content="↗" Tag="2" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Flecha (A)" AutomationProperties.Name="Flecha" />
-      <Button x:Name="RectangleButton" Content="□" Tag="3" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Rectángulo (R)" AutomationProperties.Name="Rectángulo" />
-      <Button x:Name="HighlightButton" Content="▰" Tag="4" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Resaltador (H)" AutomationProperties.Name="Resaltador" />
-      <Button x:Name="TextButton" Content="T" Tag="5" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Añadir texto (T). Doble clic sobre un texto para editarlo." AutomationProperties.Name="Añadir texto" />
-      <Button x:Name="RedactButton" Content="■" Tag="6" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Censurar con bloque sólido (C)" AutomationProperties.Name="Censurar" />
-      <Button x:Name="PixelateButton" Content="▦" Tag="7" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Pixelar (X)" AutomationProperties.Name="Pixelar" />
-      <Button x:Name="BlurButton" Content="◌" Tag="8" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Desenfocar (D)" AutomationProperties.Name="Desenfocar" />
-      <Button x:Name="StepButton" Content="①" Tag="9" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Numerar pasos (N). Haz clic varias veces para continuar." AutomationProperties.Name="Numerar pasos" />
+      <Button x:Name="AreaButton" Style="{StaticResource FloatingTool}" Click="Area_Click" ToolTip="Ajustar área (B). Arrastra sus bordes o el fondo para moverla." AutomationProperties.Name="Ajustar área"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconRegion}" /></Button>
+      <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Margin="2,5" />
+      <Button x:Name="SelectButton" Tag="0" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Seleccionar y mover anotaciones (V)" AutomationProperties.Name="Seleccionar anotaciones"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconPointer}" /></Button>
+      <Button x:Name="PenButton" Tag="1" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Lápiz (P)" AutomationProperties.Name="Lápiz"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconPen}" /></Button>
+      <Button x:Name="ArrowButton" Tag="2" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Flecha (A)" AutomationProperties.Name="Flecha"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconArrow}" /></Button>
+      <Button x:Name="RectangleButton" Tag="3" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Rectángulo (R)" AutomationProperties.Name="Rectángulo"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconRectangle}" /></Button>
+      <Button x:Name="HighlightButton" Tag="4" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Resaltador (H)" AutomationProperties.Name="Resaltador"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconHighlight}" /></Button>
+      <Button x:Name="TextButton" Tag="5" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Añadir texto (T). Doble clic sobre un texto para editarlo." AutomationProperties.Name="Añadir texto"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconText}" /></Button>
+      <Button x:Name="RedactButton" Tag="6" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Censurar con bloque sólido (C)" AutomationProperties.Name="Censurar"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconRedact}" /></Button>
+      <Button x:Name="PixelateButton" Tag="7" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Pixelar (X)" AutomationProperties.Name="Pixelar"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconPixelate}" /></Button>
+      <Button x:Name="BlurButton" Tag="8" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Desenfocar (D)" AutomationProperties.Name="Desenfocar"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconBlur}" /></Button>
+      <Button x:Name="StepButton" Tag="9" Style="{StaticResource FloatingTool}" Click="Tool_Click" ToolTip="Numerar pasos (N). Haz clic varias veces para continuar." AutomationProperties.Name="Numerar pasos"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconStep}" /></Button>
       <Button x:Name="ColorButton" Style="{StaticResource FloatingTool}" Click="Color_Click" ToolTip="Color y grosor" AutomationProperties.Name="Color y grosor"><Rectangle x:Name="ColorSwatch" Width="20" Height="20" Fill="#FF6B6B" Stroke="White" StrokeThickness="1" RadiusX="3" RadiusY="3" /></Button>
-      <Border BorderBrush="#3A4759" BorderThickness="0,1,0,0" Margin="2,5" />
-      <Button x:Name="UndoButton" Content="↶" Style="{StaticResource FloatingTool}" Click="Undo_Click" ToolTip="Deshacer (Ctrl+Z), incluido el ajuste del área" AutomationProperties.Name="Deshacer" />
-      <Button x:Name="RedoButton" Content="↷" Style="{StaticResource FloatingTool}" Click="Redo_Click" ToolTip="Rehacer (Ctrl+Y)" AutomationProperties.Name="Rehacer" />
-      <Button x:Name="DeleteButton" Content="×" Style="{StaticResource FloatingTool}" Click="Delete_Click" ToolTip="Eliminar la anotación seleccionada (Supr)" AutomationProperties.Name="Eliminar anotación" />
+      <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Margin="2,5" />
+      <Button x:Name="UndoButton" Style="{StaticResource FloatingTool}" Click="Undo_Click" ToolTip="Deshacer (Ctrl+Z), incluido el ajuste del área" AutomationProperties.Name="Deshacer"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconUndo}" /></Button>
+      <Button x:Name="RedoButton" Style="{StaticResource FloatingTool}" Click="Redo_Click" ToolTip="Rehacer (Ctrl+Y)" AutomationProperties.Name="Rehacer"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconRedo}" /></Button>
+      <Button x:Name="DeleteButton" Style="{StaticResource FloatingTool}" Click="Delete_Click" ToolTip="Eliminar la anotación seleccionada (Supr)" AutomationProperties.Name="Eliminar anotación"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconDelete}" /></Button>
      </StackPanel>
     </ScrollViewer>
    </Border>
-   <Border x:Name="ActionsPanel" Visibility="Collapsed" Background="#F5171F2B" BorderBrush="#536275" BorderThickness="1" CornerRadius="9" Padding="6">
+   <Border x:Name="ActionsPanel" Visibility="Collapsed" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="9" Padding="6">
     <WrapPanel>
-     <Button x:Name="CopyButton" Content="Copiar" Style="{StaticResource AccentButton}" Click="Copy_Click" Padding="13,9" Margin="2" ToolTip="Copiar imagen y terminar (Ctrl+C o Enter)" />
-     <Button x:Name="SaveButton" Content="Guardar" Click="Save_Click" Padding="13,9" Margin="2" ToolTip="Guardar y terminar (Ctrl+S). Ctrl+Shift+S: guardar como." />
+     <Button x:Name="CopyButton" Style="{StaticResource AccentButton}" Click="Copy_Click" Padding="13,9" Margin="2" ToolTip="Copiar imagen y terminar (Ctrl+C o Enter)" AutomationProperties.Name="Copiar"><StackPanel Orientation="Horizontal"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconCopy}" Width="16" Height="16" Margin="0,0,6,0" /><TextBlock Text="Copiar" VerticalAlignment="Center" /></StackPanel></Button>
+     <Button x:Name="SaveButton" Click="Save_Click" Padding="13,9" Margin="2" ToolTip="Guardar y terminar (Ctrl+S). Ctrl+Shift+S: guardar como." AutomationProperties.Name="Guardar"><StackPanel Orientation="Horizontal"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconSave}" Width="16" Height="16" Margin="0,0,6,0" /><TextBlock Text="Guardar" VerticalAlignment="Center" /></StackPanel></Button>
      <Button Content="OCR" Click="Ocr_Click" Padding="13,9" Margin="2" ToolTip="Extraer texto de la región original, sin conexión (Ctrl+T)" />
      <Button Content="Editor" Click="Editor_Click" Padding="13,9" Margin="2" ToolTip="Continuar en el editor completo (Ctrl+E)" />
      <Button Content="Anclar" Click="Pin_Click" Padding="13,9" Margin="2" ToolTip="Anclar una copia y terminar (Ctrl+I)" />
      <Button x:Name="ScrollButton" Content="Desplazar" Click="Scroll_Click" Padding="13,9" Margin="2" ToolTip="Capturar hacia abajo en la ventana real. Centra la selección sobre el documento; podrás detectar el área automáticamente. Añade anotaciones después." />
-     <Button Content="×" Click="Cancel_Click" Padding="13,9" Margin="2" ToolTip="Cancelar captura (Esc)" AutomationProperties.Name="Cancelar captura" />
+     <Button Click="Cancel_Click" Padding="10,9" Margin="2" ToolTip="Cancelar captura (Esc)" AutomationProperties.Name="Cancelar captura"><ContentControl Style="{StaticResource Icon}" Content="{StaticResource IconClose}" /></Button>
     </WrapPanel>
    </Border>
   </Canvas>
-  <Border x:Name="StatusPanel" Visibility="Collapsed" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="18" Padding="16,10" CornerRadius="8" Background="#F5171F2B" MaxWidth="700" IsHitTestVisible="False">
-   <TextBlock x:Name="StatusText" TextWrapping="Wrap" Foreground="#F1F5FA" AutomationProperties.LiveSetting="Polite" />
+  <Border x:Name="StatusPanel" Visibility="Collapsed" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="18" Padding="16,10" CornerRadius="8" Background="{DynamicResource SurfaceBrush}" MaxWidth="700" IsHitTestVisible="False">
+   <TextBlock x:Name="StatusText" TextWrapping="Wrap" Foreground="{DynamicResource TextBrush}" AutomationProperties.LiveSetting="Polite" />
   </Border>
   <Popup x:Name="ColorPopup" PlacementTarget="{Binding ElementName=ColorButton}" Placement="Left" StaysOpen="False" AllowsTransparency="True">
-   <Border Background="#17212E" BorderBrush="#536275" BorderThickness="1" CornerRadius="8" Padding="14">
+   <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="14"
+    TextElement.Foreground="{DynamicResource TextBrush}">
     <StackPanel>
-     <TextBlock Text="COLOR" Foreground="{StaticResource MutedBrush}" FontSize="11" Margin="0,0,0,8" />
+     <TextBlock Text="COLOR" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,0,0,8" />
      <StackPanel x:Name="PalettePanel" Orientation="Horizontal">
       <Button Width="28" Height="28" Padding="0" Margin="2" Background="#FF6B6B" Tag="0" Click="Palette_Click" ToolTip="Coral" AutomationProperties.Name="Coral" />
       <Button Width="28" Height="28" Padding="0" Margin="2" Background="#78E7C3" Tag="1" Click="Palette_Click" ToolTip="Menta" AutomationProperties.Name="Menta" />
