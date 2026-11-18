@@ -4,9 +4,9 @@ Aplicación de escritorio para **Windows**, escrita en **C# / .NET 10 / WPF**. C
 
 ## Descargar y ejecutar
 
-Descarga la aplicación preparada desde **[Releases · última versión](https://github.com/JoseMoscol/deskshot/releases/latest)**. Elige **DeskShot-0.9.0-win-x64-Setup.exe** para instalarla con asistente en español, acceso en Inicio y desinstalador. Se instala para tu usuario e incluye .NET, los idiomas OCR y el redistribuible oficial de Visual C++ x64, que solo se ejecuta cuando falta. Esa dependencia puede pedir permisos de administrador.
+Descarga la aplicación preparada desde **[Releases · última versión](https://github.com/JoseMoscol/deskshot/releases/latest)**. Elige **DeskShot-0.10.0-win-x64-Setup.exe** para instalarla con asistente en español, acceso en Inicio y desinstalador. Se instala para tu usuario e incluye .NET, los idiomas OCR y el redistribuible oficial de Visual C++ x64, que solo se ejecuta cuando falta. Esa dependencia puede pedir permisos de administrador.
 
-También está disponible **DeskShot-0.9.0-win-x64.zip**: usa **Extraer todo** y abre `DeskShot.exe` dentro de la carpeta extraída. Conserva todos sus archivos. Las dos ediciones incluyen .NET y los modelos OCR: no requieren Visual Studio, el SDK ni instalar .NET por separado. El ZIP necesita Visual C++ x64 disponible en el equipo. Los archivos automáticos Source code contienen el proyecto para compilar. Todavía no hay firma de código.
+También está disponible **DeskShot-0.10.0-win-x64.zip**: usa **Extraer todo** y abre `DeskShot.exe` dentro de la carpeta extraída. Conserva todos sus archivos. Las dos ediciones incluyen .NET y los modelos OCR: no requieren Visual Studio, el SDK ni instalar .NET por separado. El ZIP necesita Visual C++ x64 disponible en el equipo. Los archivos automáticos Source code contienen el proyecto para compilar. Todavía no hay firma de código.
 
 **[Manual de descarga, uso, actualización y desinstalación](docs/INSTALACION.md).**
 
@@ -16,13 +16,13 @@ Desde **Actualizaciones** en la ventana principal o **Buscar actualizaciones** e
 
 En Configuración puedes activar **Buscar actualizaciones al iniciar**, desactivado por defecto. Esta opción solo avisa; la descarga y la instalación requieren tu acción. No se envían imágenes ni texto OCR, no hay cuentas ni telemetría. Sin conexión puedes seguir capturando y usando OCR.
 
-**Si tienes la versión 0.6.0 o anterior, instala manualmente la 0.9.0 una vez para incorporar esta función.** Desde la edición portable, el botón instala la edición normal; para conservar el uso portable, descarga y extrae el nuevo ZIP en otra carpeta.
+**Si tienes la versión 0.6.0 o anterior, instala manualmente la 0.10.0 una vez para incorporar esta función.** Desde la edición portable, el botón instala la edición normal; para conservar el uso portable, descarga y extrae el nuevo ZIP en otra carpeta.
 
 Los instaladores verificados se conservan en `%LOCALAPPDATA%\DeskShot\Updates`. No hay actualizaciones diferenciales ni instalación silenciosa: se utiliza el asistente completo. La aplicación y el instalador siguen sin firma de código; el SHA-256 comprueba integridad respecto al Release, no sustituye una firma del editor.
 
 ## Ejecutar desde el proyecto
 
-Abre `artifacts/DeskShot-0.9.0/DeskShot.exe`, o haz doble clic en `Iniciar DeskShot.cmd` desde la raíz del proyecto. El lanzador compila si todavía no existe el ejecutable publicado. Si la versión anterior sigue en la bandeja, elige **Salir** en su menú antes de abrir esta actualización. La publicación separada conserva intactos los archivos de la instancia anterior y ambas versiones comparten la configuración existente.
+Abre `artifacts/DeskShot-0.10.0/DeskShot.exe`, o haz doble clic en `Iniciar DeskShot.cmd` desde la raíz del proyecto. El lanzador compila si todavía no existe el ejecutable publicado. Si la versión anterior sigue en la bandeja, elige **Salir** en su menú antes de abrir esta actualización. La publicación separada conserva intactos los archivos de la instancia anterior y ambas versiones comparten la configuración existente.
 
 - Para ejecutar: **.NET 10 Desktop Runtime** y una sesión interactiva de Windows 10/11.
 - El motor OCR nativo requiere **Microsoft Visual C++ Redistributable 2015–2022** de la arquitectura del proceso (x64 en este equipo). Sus bibliotecas ya estaban instaladas y se verificó el funcionamiento real del motor.
@@ -163,7 +163,7 @@ Para generar también Setup.exe, usa `./build-installer.ps1 -Compiler RUTA/ISCC.
 
 `./verify-installer.ps1 -Installer RUTA/Setup.exe` prueba instalación, bloqueo de una instancia abierta, reinstalación y desinstalación. Usa una carpeta temporal del workspace; requiere que no exista otra instalación registrada, ni la carpeta instalada `%LOCALAPPDATA%\Programs\DeskShot`, ni un grupo de Inicio DeskShot, y que Visual C++ ya esté disponible. Se detiene antes de instalar si encuentra cualquiera de ellos: Inno Setup ignora `/GROUP` cuando su página de grupo está desactivada. Retira la copia de prueba al terminar, también si una comprobación falla. No prueba la instalación elevada del redistribuible. Comprueba que se conserven las preferencias del usuario y los archivos ajenos al programa.
 
-Para preparar la descarga portable de Windows x64, ejecuta `./package-release.ps1`. Publica con .NET incluido, valida los archivos necesarios y ejecuta las pruebas con un verificador autocontenido que utiliza exactamente la misma DLL de DeskShot. Genera el ZIP y su SHA-256 en `artifacts/releases/v0.9.0`. No sobrescribe paquetes existentes; los archivos temporales y las evidencias quedan en `artifacts/release-staging/`. La primera ejecución puede descargar los paquetes oficiales del runtime desde NuGet. `-SkipTests` omite las pruebas y se reserva para un paquete que ya se haya verificado.
+Para preparar la descarga portable de Windows x64, ejecuta `./package-release.ps1`. Publica con .NET incluido, valida los archivos necesarios y ejecuta las pruebas con un verificador autocontenido que utiliza exactamente la misma DLL de DeskShot. Genera el ZIP y su SHA-256 en `artifacts/releases/v0.10.0`. No sobrescribe paquetes existentes; los archivos temporales y las evidencias quedan en `artifacts/release-staging/`. La primera ejecución puede descargar los paquetes oficiales del runtime desde NuGet. `-SkipTests` omite las pruebas y se reserva para un paquete que ya se haya verificado.
 
 Desde PowerShell:
 
@@ -173,14 +173,14 @@ Desde PowerShell:
 .\build.ps1 -CheckDesktop
 ```
 
-El script compila, ejecuta las pruebas y publica en `artifacts/DeskShot-0.9.0`. Las pruebas verifican selección, historial, independencia del original, PNG 4K píxel a píxel, dimensiones y firmas JPG, anotaciones, configuración, atajos y render de la interfaz. También comprueban selección por orden de capas, tiradores solapados, movimiento y redimensionado con límites, un deshacer por gesto, cancelación, edición de texto, eliminación y controles de propiedades. El modo flotante añade pruebas de los ocho tiradores, ajuste de bordes, recorte exacto, historial de región, posición de las barras y continuidad con el editor. Ejecutan OCR real tanto de imágenes completas como de regiones anotadas, usando el original. Las previsualizaciones y resultados se generan en `artifacts/verification`.
+El script compila, ejecuta las pruebas y publica en `artifacts/DeskShot-0.10.0`. Las pruebas verifican selección, historial, independencia del original, PNG 4K píxel a píxel, dimensiones y firmas JPG, anotaciones, configuración, atajos y render de la interfaz. También comprueban selección por orden de capas, tiradores solapados, movimiento y redimensionado con límites, un deshacer por gesto, cancelación, edición de texto, eliminación y controles de propiedades. El modo flotante añade pruebas de los ocho tiradores, ajuste de bordes, recorte exacto, historial de región, posición de las barras y continuidad con el editor. Ejecutan OCR real tanto de imágenes completas como de regiones anotadas, usando el original. Las previsualizaciones y resultados se generan en `artifacts/verification`.
 
 Comandos individuales:
 
 ```powershell
 dotnet build DeskShot.slnx -c Release -m:1 -nr:false
 dotnet tests/DeskShot.Tests/bin/Release/net10.0-windows/DeskShot.Tests.dll artifacts/verification
-dotnet publish src/DeskShot/DeskShot.csproj -c Release --self-contained false -o artifacts/DeskShot-0.9.0 -m:1 -nr:false
+dotnet publish src/DeskShot/DeskShot.csproj -c Release --self-contained false -o artifacts/DeskShot-0.10.0 -m:1 -nr:false
 ```
 
 El registro real de atajos requiere una sesión interactiva de Windows con permiso para `RegisterHotKey`; un entorno aislado puede bloquearlo. La prueba libera sus atajos al terminar. Las previsualizaciones usan contenido sintético, no capturas del usuario.

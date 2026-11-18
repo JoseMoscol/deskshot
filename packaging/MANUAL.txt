@@ -18,6 +18,8 @@ PRIMERA CAPTURA
 - Copiar o Guardar termina la captura. PNG conserva los detalles.
 - OCR extrae texto localmente en espanol e ingles.
 - En Configuracion puedes cambiar el atajo, la carpeta y PNG/JPG.
+- Configuracion > Apariencia: Sistema, Claro u Oscuro. El cambio se
+  aplica al instante y se guarda.
 - C: censurar con un bloque opaco. X: pixelar. D: desenfocar.
   Los filtros tienen intensidad ajustable. Para datos sensibles usa
   un bloque solido. El OCR respeta las zonas censuradas.
@@ -61,7 +63,7 @@ y vuelve a abrirse al terminar. Se conserva la carpeta de instalacion.
 En Configuracion puedes activar buscar al iniciar (desactivado por defecto).
 No se descarga ni instala sin tu accion. Solo se consulta GitHub; las
 capturas y el OCR siguen siendo locales y no se envian.
-Si vienes de 0.6.0 o anterior, instala 0.9.0 manualmente una vez.
+Si vienes de 0.6.0 o anterior, instala la ultima version manualmente.
 Las descargas quedan en %LOCALAPPDATA%\DeskShot\Updates.
 Antes de desinstalar, sal de DeskShot desde la bandeja.
 Para quitarlo usa Configuracion de Windows > Aplicaciones > DeskShot.

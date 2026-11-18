@@ -38,6 +38,8 @@ USO RAPIDO
   Conserva todos los pixeles con compresion sin perdida, sin capa OCR.
   Hasta 50 imagenes, 32 megapixeles por imagen, 160 por PDF y 500 paginas.
 - Configuracion: atajo, carpeta, formato PNG/JPG y otras preferencias.
+- Configuracion > Apariencia: Sistema, Claro u Oscuro. El cambio se
+  aplica al instante y se guarda.
 - C: bloque opaco de censura. X: pixelado. D: desenfoque. Ajusta la
   intensidad de los filtros. Para datos sensibles usa un bloque solido.
   El OCR respeta las zonas censuradas.
